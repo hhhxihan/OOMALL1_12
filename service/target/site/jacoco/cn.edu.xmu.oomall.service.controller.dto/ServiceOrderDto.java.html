@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceOrderDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.controller.dto</a> &gt; <span class="el_source">ServiceOrderDto.java</span></div><h1>ServiceOrderDto.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.controller.dto;
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.javaee.core.model.dto.IdNameTypeDto;
+
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.oomall.service.dao.bo.ServiceOrder;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+
+import java.time.LocalDateTime;
+
+<span class="nc" id="L13">@AllArgsConstructor</span>
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@CopyFrom({ServiceOrder.class})
+public class ServiceOrderDto {
+    // 服务单id
+    private Long id;
+    // 种类
+    private Byte type;
+    // 服务地址
+    private String address;
+    // 联系人姓名
+    private String consignee;
+    // 联系人电话
+    private String mobile;
+    // 维修人姓名
+    private String maintainer_name;
+    // 维修人电话
+    private String maintainer_mobile;
+    // 状态
+    private Byte status;
+    // 描述
+    private String description;
+    // 服务单创建时间
+    private LocalDateTime gmtCreate;
+    // 服务单接受时间
+    private LocalDateTime gmtModified;
+    // 收件时间
+    private LocalDateTime gmtReceived;
+    // 服务结束时间
+    private LocalDateTime gmtEnd;
+    // 服务结果
+    private String result;
+    private IdNameTypeDto creator;
+    private IdNameTypeDto modifier;
+    // 服务商id
+    private Long serviceProviderId;
+    // 产品id
+    private Long productId;
+    // 地区id
+    private Long regionId;
+    // 商铺id
+    private Long shopId;
+
+    public ServiceOrderDto(ServiceOrder serviceOrder){
+<span class="fc" id="L57">        super();</span>
+<span class="fc" id="L58">        CloneFactory.copy(this, serviceOrder);</span>
+<span class="fc" id="L59">        this.creator = IdNameTypeDto.builder().id(serviceOrder.getCreatorId()).name(serviceOrder.getCreatorName()).build();</span>
+<span class="fc" id="L60">        this.modifier = IdNameTypeDto.builder().id(serviceOrder.getModifierId()).name(serviceOrder.getModifierName()).build();</span>
+<span class="fc" id="L61">    }</span>
+
+<span class="fc" id="L63">    public Long getId() { return id;}</span>
+    public void setId(Long id) {
+<span class="fc" id="L65">        this.id = id;</span>
+<span class="fc" id="L66">    }</span>
+    public Byte getType() {
+<span class="fc" id="L68">        return type;</span>
+    }
+    public void setType(Byte type) {
+<span class="fc" id="L71">        this.type = type;</span>
+<span class="fc" id="L72">    }</span>
+    public String getAddress() {
+<span class="fc" id="L74">        return address;</span>
+    }
+    public void setAddress(String address) {
+<span class="fc" id="L77">        this.address = address;</span>
+<span class="fc" id="L78">    }</span>
+    public String getConsignee() {
+<span class="fc" id="L80">        return consignee;</span>
+    }
+    public void setConsignee(String consignee) {
+<span class="fc" id="L83">        this.consignee = consignee;</span>
+<span class="fc" id="L84">    }</span>
+    public String getMobile() {
+<span class="fc" id="L86">        return mobile;</span>
+    }
+    public void setMobile(String mobile) {
+<span class="fc" id="L89">        this.mobile = mobile;</span>
+<span class="fc" id="L90">    }</span>
+    public String getMaintainer_name() {
+<span class="fc" id="L92">        return maintainer_name;</span>
+    }
+    public void setMaintainer_name(String maintainer_name) {
+<span class="nc" id="L95">        this.maintainer_name = maintainer_name;</span>
+<span class="nc" id="L96">    }</span>
+    public String getMaintainer_mobile() {
+<span class="fc" id="L98">        return maintainer_mobile;</span>
+    }
+    public void setMaintainer_mobile(String maintainer_mobile) {
+<span class="nc" id="L101">        this.maintainer_mobile = maintainer_mobile;</span>
+<span class="nc" id="L102">    }</span>
+    public Byte getStatus() {
+<span class="fc" id="L104">        return status;</span>
+    }
+    public void setStatus(Byte status) {
+<span class="fc" id="L107">        this.status = status;</span>
+<span class="fc" id="L108">    }</span>
+    public String getDescription() {
+<span class="fc" id="L110">        return description;</span>
+    }
+<span class="fc" id="L112">    public void setDescription(String description) { this.description = description; }</span>
+    public LocalDateTime getGmtCreate() {
+<span class="fc" id="L114">        return gmtCreate;</span>
+    }
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+<span class="fc" id="L117">        this.gmtCreate = gmtCreate;</span>
+<span class="fc" id="L118">    }</span>
+    public LocalDateTime getGmtModified() {
+<span class="fc" id="L120">        return gmtModified;</span>
+    }
+    public void setGmtModified(LocalDateTime gmtModified) {
+<span class="fc" id="L123">        this.gmtModified = gmtModified;</span>
+<span class="fc" id="L124">    }</span>
+    public LocalDateTime getGmtReceived() {
+<span class="fc" id="L126">        return gmtReceived;</span>
+    }
+    public void setGmtReceived(LocalDateTime gmtReceived) {
+<span class="fc" id="L129">        this.gmtReceived = gmtReceived;</span>
+<span class="fc" id="L130">    }</span>
+    public LocalDateTime getGmtEnd() {
+<span class="fc" id="L132">        return gmtEnd;</span>
+    }
+    public void setGmtEnd(LocalDateTime gmtEnd) {
+<span class="fc" id="L135">        this.gmtEnd = gmtEnd;</span>
+<span class="fc" id="L136">    }</span>
+    public String getResult() {
+<span class="fc" id="L138">        return result;</span>
+    }
+    public void setResult(String result) {
+<span class="fc" id="L141">        this.result = result;</span>
+<span class="fc" id="L142">    }</span>
+<span class="fc" id="L143">    public Long getServiceProviderId(){ return serviceProviderId; }</span>
+<span class="fc" id="L144">    public void setServiceProviderId(Long serviceProviderId){ this.serviceProviderId = serviceProviderId; }</span>
+<span class="fc" id="L145">    public Long getProductId(){ return productId; }</span>
+<span class="fc" id="L146">    public void setProductId(Long productId){ this.productId = productId; }</span>
+<span class="fc" id="L147">    public Long getRegionId(){ return regionId; }</span>
+<span class="fc" id="L148">    public void setRegionId(Long regionId){ this.regionId = regionId; }</span>
+<span class="fc" id="L149">    public Long getShopId(){ return shopId; }</span>
+<span class="fc" id="L150">    public void setShopId(Long shopId){ this.shopId = shopId; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceProviderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.service</a> &gt; <span class="el_source">ServiceProviderService.java</span></div><h1>ServiceProviderService.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.service;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.oomall.service.dao.ServiceOrderDao;
+import cn.edu.xmu.oomall.service.dao.ServiceProviderDao;
+import cn.edu.xmu.oomall.service.dao.bo.ServiceProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional(propagation = Propagation.REQUIRED)
+public class ServiceProviderService {
+<span class="fc" id="L21">    private static  final Logger logger = LoggerFactory.getLogger(ServiceProviderService.class);</span>
+
+    private ServiceProviderDao serviceProviderDao;
+    @Autowired
+    private ServiceOrderDao serviceOrderDao;
+
+    @Autowired
+<span class="fc" id="L28">    public ServiceProviderService(ServiceProviderDao serviceProviderDao){</span>
+<span class="fc" id="L29">        this.serviceProviderDao = serviceProviderDao;</span>
+<span class="fc" id="L30">    }</span>
+
+
+    /**
+     * 服务商注册账号
+     */
+    public ServiceProvider createServiceProvider(ServiceProvider serviceProvider, UserDto user){
+<span class="fc" id="L37">        List&lt;ServiceProvider&gt; serviceProviders = this.serviceProviderDao.retrieveByCreatorId(user.getId(), 1, 10);</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        if(serviceProviders.size()!=0) {</span>
+<span class="nc" id="L39">            throw new BusinessException(ReturnNo.SERVICEPROVIDER_USER_HASSHOP, String.format(ReturnNo.SERVICEPROVIDER_USER_HASSHOP.getMessage(), user.getId()));</span>
+        }
+<span class="fc" id="L41">        ServiceProvider ret = this.serviceProviderDao.insert(serviceProvider, user);</span>
+<span class="fc" id="L42">        return ret;</span>
+    }
+
+    /**
+     * 服务商查看账户信息
+     */
+    public ServiceProvider findServiceProviderById(Long id){
+<span class="fc" id="L49">        ServiceProvider ret = this.serviceProviderDao.findById(id);</span>
+<span class="fc" id="L50">        return ret;</span>
+    }
+
+    /**
+     * 服务商修改账户信息
+     */
+    public ServiceProvider updateServiceProvider(ServiceProvider serviceProvider, UserDto user){
+<span class="fc" id="L57">        ServiceProvider oldServiceProvider = this.serviceProviderDao.findById(serviceProvider.getId());</span>
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if(oldServiceProvider.getStatus().equals(ServiceProvider.ABANDON)){</span>
+<span class="nc" id="L59">            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务商&quot;, serviceProvider.getId(), serviceProvider.getStatusName()));</span>
+        }
+<span class="fc" id="L61">        serviceProvider.setStatus(oldServiceProvider.getStatus());</span>
+<span class="fc" id="L62">        ServiceProvider ret = this.serviceProviderDao.save(serviceProvider, user);</span>
+<span class="fc" id="L63">        return ret;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

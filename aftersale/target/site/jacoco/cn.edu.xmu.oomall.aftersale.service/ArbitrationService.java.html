@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArbitrationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.service</a> &gt; <span class="el_source">ArbitrationService.java</span></div><h1>ArbitrationService.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.service;
+
+import cn.edu.xmu.javaee.core.mapper.RedisUtil;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.oomall.aftersale.dao.AftersaleDao;
+import cn.edu.xmu.oomall.aftersale.dao.ArbitrationDao;
+import cn.edu.xmu.oomall.aftersale.dao.bo.Aftersale;
+import cn.edu.xmu.oomall.aftersale.dao.bo.Arbitration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(propagation = Propagation.REQUIRED)
+public class ArbitrationService {
+<span class="fc" id="L20">    private final Logger logger = LoggerFactory.getLogger(ArbitrationService.class);</span>
+
+    @Value(&quot;3600&quot;)
+    private int timeout;
+
+<span class="fc" id="L25">    private ArbitrationDao arbitrationDao = null;</span>
+<span class="fc" id="L26">    private AftersaleDao aftersaleDao = null;</span>
+    private final RedisUtil redisUtil;
+
+    @Autowired
+<span class="fc" id="L30">    public ArbitrationService(ArbitrationDao arbitrationDao, AftersaleDao aftersaleDao,RedisUtil redisUtil) {</span>
+<span class="fc" id="L31">        this.arbitrationDao = arbitrationDao;</span>
+<span class="fc" id="L32">        this.aftersaleDao = aftersaleDao;</span>
+<span class="fc" id="L33">        this.redisUtil = redisUtil;</span>
+<span class="fc" id="L34">    }</span>
+
+
+
+
+    /**
+     * 创建仲裁单
+     * @param id aftersale id
+     * @param arbitration arbitration对象
+     * @param user 登录用户
+     * @return 新arbitration对象，带id
+     */
+    public Arbitration createArbitration(Long id, Arbitration arbitration, UserDto user) {
+
+
+<span class="fc" id="L49">        Aftersale aftersale = this.aftersaleDao.findById(id);</span>
+<span class="fc" id="L50">        Arbitration newArbitration=aftersale.createArbitrationByAftersale(arbitration, user);</span>
+<span class="fc" id="L51">        return newArbitration;</span>
+    }
+    /**
+     * 取消仲裁单
+     */
+    public void cancelArbitrationById(Long id, UserDto user) {
+<span class="fc" id="L57">        Arbitration arbitration = this.arbitrationDao.findById(id);</span>
+
+<span class="fc" id="L59">        String key= arbitration.cancelArbitration(user);</span>
+<span class="fc" id="L60">        this.redisUtil.del(key);</span>
+<span class="fc" id="L61">    }</span>
+    /**
+     * 应诉仲裁
+     * @param arbitrationId 仲裁单
+     * @param shopReply 商户回应
+     * @param user 登录用户
+     */
+    /*public void appealArbitration(Long arbitrationId, String shopReply, UserDto user) {
+        Arbitration arbitration = this.arbitrationDao.findById(arbitrationId);
+        String key = arbitration.addReply(user,shopReply);
+        this.redisUtil.del(key);
+    }*/
+    /**
+     * 仲裁结案
+     * @param id 仲裁单
+     * @param result 仲裁结果
+     * @param user 登录用户
+     */
+    /*public void finishArbitrationById(Long id, String result, UserDto user) {
+        Arbitration arbitration = this.arbitrationDao.findById(id);
+        String key = arbitration.finishArbitration(user,result);
+        this.redisUtil.del(key);
+    }*/
+    /**
+     * 受理仲裁
+     * @param id 仲裁单
+     * @param arbitrator 仲裁员信息
+     * @param user 登录用户
+     */
+   /* public void acceptArbitrationById(Long id, IdNameTypeDto arbitrator, UserDto user) {
+        Arbitration arbitration = this.arbitrationDao.findById(id);
+        arbitration.setArbitratorId(arbitrator.getId());
+        arbitration.setArbitratorName(arbitrator.getName());
+        String key = arbitration.changeStatus(arbitration.getStatus(),user);
+        this.redisUtil.del(key);
+    }*/
+
+    /**
+     * 查询申请还未受理的仲裁单
+
+     * @return
+     */
+    /*public List&lt;Arbitration&gt; retrieveArbitrations(Integer page, Integer pageSize) {
+        //查询申请还未受理的仲裁单
+        return this.arbitrationDao.retrieveByStatus(Arbitration.APPLY,page, pageSize);
+    }*/
+    /**
+     * 根据id返回仲裁单
+     *
+
+     * @param id     仲裁单Id
+     * @return
+     */
+   /* public Arbitration findById(Long id) throws BusinessException {
+        return this.arbitrationDao.findById(id);
+    }*/
+/*
+    */
+/**
+     * 根据状态查询仲裁单
+
+     * @return
+     *//*
+
+    public List&lt;Arbitration&gt; retrieveArbitrationsBystatus(Byte status,Integer page, Integer pageSize) {
+
+        return this.arbitrationDao.getArbitrationByStatus(status,page,pageSize);
+    }
+*/
+
+    /**
+     * 修改已有仲裁单
+     * 已经完成的仲裁单不能修改
+     * @param id     仲裁单Id
+     *//*
+    public void updateArbitrationById(Long id, Arbitration arbitration, UserDto modifier) {
+
+        Arbitration oldArbitration = this.arbitrationDao.findById(id);
+        //如果该仲裁单的状态是已经结案了，不允许修改
+        if(oldArbitration.getStatus().equals(Arbitration.FINISH)){
+            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;仲裁单&quot;, oldArbitration.getId(), &quot;已结案&quot;));
+        }
+        if (this.arbitrationDao == null){
+            throw new IllegalArgumentException(&quot;ArbitrationDao.cancel: arbitrationDao is null&quot;);
+        }
+        arbitration.setId(id);
+        arbitration.setStatus(Arbitration.APPLY);
+
+        this.arbitrationDao.save(arbitration, modifier);
+    }*/
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

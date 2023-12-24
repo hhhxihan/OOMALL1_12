@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArbitrationDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.dao</a> &gt; <span class="el_source">ArbitrationDao.java</span></div><h1>ArbitrationDao.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.dao;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.mapper.RedisUtil;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.oomall.aftersale.dao.bo.Arbitration;
+import cn.edu.xmu.oomall.aftersale.mapper.ArbitrationPoMapper;
+import cn.edu.xmu.oomall.aftersale.mapper.po.ArbitrationPo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static cn.edu.xmu.javaee.core.model.Constants.IDNOTEXIST;
+
+@Repository
+@RefreshScope
+public class ArbitrationDao {
+<span class="fc" id="L27">    private final static Logger logger = LoggerFactory.getLogger(ArbitrationDao.class);</span>
+
+    @Value(&quot;3600&quot;)
+    private int timeout;
+
+    public static final String KEY = &quot;A%d&quot;;
+    //@Autowired
+    private ArbitrationPoMapper arbitrationPoMapper;
+    //@Autowired
+    private RedisUtil redisUtil;
+    @Lazy
+    private AftersaleDao aftersaleDao;
+
+    private ArbitrationDao arbitrationDao;
+    @Autowired
+    @Lazy
+<span class="fc" id="L43">    public ArbitrationDao(ArbitrationDao arbitrationDao,ArbitrationPoMapper arbitrationPoMapper, RedisUtil redisUtil,AftersaleDao aftersaleDao) {</span>
+<span class="fc" id="L44">        this.arbitrationPoMapper = arbitrationPoMapper;</span>
+<span class="fc" id="L45">        this.redisUtil = redisUtil;</span>
+<span class="fc" id="L46">        this.aftersaleDao=aftersaleDao;</span>
+<span class="fc" id="L47">        this.arbitrationDao=arbitrationDao;</span>
+<span class="fc" id="L48">    }</span>
+
+    /*public void build(Arbitration bo) {
+        bo.setArbitrationDao(ArbitrationDao.this);
+    }*/
+
+    public Arbitration build(ArbitrationPo po, Optional&lt;String&gt; redisKey) {
+<span class="fc" id="L55">        Arbitration bo = CloneFactory.copy(new Arbitration(), po);</span>
+<span class="fc" id="L56">        this.build(bo);</span>
+<span class="fc" id="L57">        redisKey.ifPresent(key -&gt; redisUtil.set(key, bo, timeout));</span>
+<span class="fc" id="L58">        return bo;</span>
+    }
+    private Arbitration build(Arbitration bo){
+<span class="fc" id="L61">        bo.setArbitrationDao(this);</span>
+<span class="fc" id="L62">        bo.setAftersaleDao(this.aftersaleDao);</span>
+<span class="fc" id="L63">        return bo;</span>
+    }
+    /**
+     * 创建仲裁单
+     *
+     * @param bo   仲裁单bo
+     * @param user 登录用户
+     */
+    public Arbitration insert(Arbitration bo, UserDto user) throws RuntimeException {
+<span class="fc" id="L72">        bo.setId(null);</span>
+<span class="fc" id="L73">        bo.setCreator(user);</span>
+<span class="fc" id="L74">        LocalDateTime currentTime = LocalDateTime.now();</span>
+<span class="fc" id="L75">        bo.setGmtCreate(currentTime);</span>
+
+<span class="fc" id="L77">        ArbitrationPo po = CloneFactory.copy(new ArbitrationPo(), bo);</span>
+
+<span class="fc" id="L79">        logger.debug(&quot;save: po = {}&quot;, po);</span>
+<span class="fc" id="L80">        po = arbitrationPoMapper.save(po);</span>
+<span class="fc" id="L81">        bo.setId(po.getId());</span>
+<span class="fc" id="L82">        return bo;</span>
+    }
+    /**
+     * 按照主键获得对象
+     * @param id
+     * @return
+     * @throws RuntimeException
+     */
+    public Arbitration findById(Long id) {
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (null == id) {</span>
+<span class="fc" id="L92">            throw new IllegalArgumentException(&quot;ArbitrationDao.findById: id is null&quot;);</span>
+        }
+<span class="fc" id="L94">        logger.debug(&quot;findObjById: id = {}&quot;, id);</span>
+<span class="fc" id="L95">        String key = String.format(KEY, id);</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (redisUtil.hasKey(key)) {</span>
+<span class="nc" id="L97">            Arbitration arbitration = (Arbitration) redisUtil.get(key);</span>
+<span class="nc" id="L98">            this.build(arbitration);</span>
+<span class="nc" id="L99">            return arbitration;</span>
+        }  else {
+<span class="fc" id="L101">            Optional&lt;ArbitrationPo&gt; poOpt = this.arbitrationPoMapper.findById(id);</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">            if (!poOpt.isPresent()) {</span>
+<span class="fc" id="L103">                throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;仲裁单&quot;, id));</span>
+            }
+<span class="fc" id="L105">            return this.build(poOpt.get(), Optional.of(key));</span>
+        }
+
+    }
+
+    /**
+     * 按照id更新仲裁单
+     */
+    public String save(Arbitration arbitration, UserDto user) {
+<span class="fc" id="L114">        ArbitrationPo po = CloneFactory.copy(new ArbitrationPo(), arbitration);</span>
+<span class="fc" id="L115">        arbitration.setModifier(user);</span>
+<span class="fc" id="L116">        arbitration.setGmtModified(LocalDateTime.now());</span>
+<span class="fc" id="L117">        logger.debug(&quot;save: po = {}&quot;, po);</span>
+<span class="nc" id="L118">        ArbitrationPo updatePo = arbitrationPoMapper.save(po);</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (IDNOTEXIST.equals(updatePo.getId())) {</span>
+<span class="nc" id="L120">            throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;仲裁单&quot;, arbitration.getId()));</span>
+        }
+<span class="nc" id="L122">        return String.format(KEY, arbitration.getId());</span>
+    }
+
+    //根据id删除仲裁
+    public String delete(Long id) throws RuntimeException {
+
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        if (!this.arbitrationPoMapper.existsById(id))</span>
+<span class="fc" id="L129">            throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;商品类目&quot;, id));</span>
+<span class="fc" id="L130">        this.arbitrationPoMapper.deleteById(id);</span>
+<span class="fc" id="L131">        return String.format(KEY, id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

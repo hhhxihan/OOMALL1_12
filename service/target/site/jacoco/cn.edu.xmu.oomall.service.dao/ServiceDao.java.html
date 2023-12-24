@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.dao</a> &gt; <span class="el_source">ServiceDao.java</span></div><h1>ServiceDao.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.dao;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.mapper.RedisUtil;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.oomall.service.dao.bo.Services;
+import cn.edu.xmu.oomall.service.mapper.ServicePoMapper;
+import cn.edu.xmu.oomall.service.mapper.po.ServicePo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Repository
+@RefreshScope
+public class ServiceDao {
+<span class="fc" id="L31">    private static final Logger logger = LoggerFactory.getLogger(ServiceDao.class);</span>
+
+    public static final String KEY = &quot;A%d&quot;;
+
+    @Value(&quot;${oomall.service.timeout}&quot;)
+    private long timeout;
+
+    private RedisUtil redisUtil;
+    private ServiceDao serviceDao;
+    private ServicePoMapper servicePoMapper;
+    @Lazy
+    private ProductServiceDao productServiceDao;
+
+    @Autowired
+    @Lazy
+<span class="fc" id="L46">    public ServiceDao(ServicePoMapper servicePoMapper, ProductServiceDao productServiceDao, ServiceDao serviceDao, RedisUtil redisUtil) {</span>
+<span class="fc" id="L47">        this.servicePoMapper = servicePoMapper;</span>
+<span class="fc" id="L48">        this.productServiceDao = productServiceDao;</span>
+<span class="fc" id="L49">        this.serviceDao = serviceDao;</span>
+<span class="fc" id="L50">        this.redisUtil = redisUtil;</span>
+<span class="fc" id="L51">    }</span>
+
+
+    public Services build(ServicePo po, String redisKey) {
+<span class="fc" id="L55">        Services bo = CloneFactory.copy(new Services(), po);</span>
+<span class="pc bpc" id="L56" title="1 of 2 branches missed.">        if (null != redisKey) {</span>
+<span class="fc" id="L57">            redisUtil.set(redisKey, bo, timeout);</span>
+        }
+<span class="fc" id="L59">        this.build(bo);</span>
+<span class="fc" id="L60">        return bo;</span>
+    }
+    private Services build(Services bo) {
+<span class="fc" id="L63">        bo.setProductServiceDao(this.productServiceDao);</span>
+<span class="fc" id="L64">        bo.setServiceDao(this);</span>
+<span class="fc" id="L65">        return bo;</span>
+    }
+    /**
+     * 按照id获得对象
+     *
+     * @param id service id
+     * @return service
+     */
+    public Services findById(Long id){
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (id.equals(null)) {</span>
+<span class="nc" id="L75">            throw new IllegalArgumentException(&quot;findById: id is null&quot;);</span>
+        }
+<span class="fc" id="L77">        logger.debug(&quot;findObjById: id = {}&quot;,id);</span>
+<span class="fc" id="L78">        String key = String.format(KEY, id);</span>
+<span class="fc" id="L79">        Services service = (Services) redisUtil.get(key);</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (!Objects.isNull(service)) {</span>
+<span class="nc" id="L81">            service = this.build(service);</span>
+        } else {
+<span class="fc" id="L83">            Optional&lt;ServicePo&gt; ret = this.servicePoMapper.findById(id);</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">            if (ret.isPresent()){</span>
+<span class="fc" id="L85">                service = this.build(ret.get(), key);</span>
+            }else{
+<span class="nc" id="L87">                throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;服务&quot;, id));</span>
+            }
+        }
+<span class="fc" id="L90">        return service;</span>
+    }
+
+    /**
+     * 按照服务商和状态找到对象
+     *
+     * @param serviceProviderId
+     * @return List&lt;Services&gt;
+     */
+    public List&lt;Services&gt; findByServiceProviderId(Long serviceProviderId, Integer page, Integer pageSize) throws RuntimeException {
+<span class="fc" id="L100">        List&lt;Services&gt; ret = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if (null == serviceProviderId) {</span>
+<span class="nc" id="L102">            throw new IllegalArgumentException(&quot;serviceProviderId can not be null.&quot;);</span>
+        }
+<span class="fc" id="L104">        Pageable pageable = PageRequest.of(page-1, pageSize);</span>
+<span class="fc" id="L105">        List&lt;ServicePo&gt; pos =  this.servicePoMapper.findByServiceProviderIdEqualsAndStatusEquals(serviceProviderId, Services.VALID, pageable);</span>
+<span class="fc" id="L106">        ret = pos.stream().map(po -&gt; CloneFactory.copy(new Services(),po)).collect(Collectors.toList());</span>
+<span class="fc" id="L107">        logger.info(&quot;bos size:{}&quot;, ret.size());</span>
+<span class="fc" id="L108">        return ret;</span>
+    }
+
+    /**
+     * 插入服务
+     */
+    public Services insert(Services service, UserDto userDto) throws RuntimeException{
+<span class="fc" id="L115">        service.setCreator(userDto);</span>
+<span class="fc" id="L116">        service.setGmtCreate(LocalDateTime.now());</span>
+<span class="fc" id="L117">        service.setStatus(Services.VALID);</span>
+<span class="fc" id="L118">        ServicePo po = CloneFactory.copy(new ServicePo(), service);</span>
+<span class="fc" id="L119">        po.setId(null);</span>
+<span class="fc" id="L120">        logger.debug(&quot;insert: po = {}&quot;, po);</span>
+<span class="fc" id="L121">        this.servicePoMapper.save(po);</span>
+<span class="fc" id="L122">        service.setId(po.getId());</span>
+<span class="fc" id="L123">        return service;</span>
+    }
+
+    /**
+     * 服务商修改服务信息
+     */
+    public String save(Services service, UserDto userDto) throws RuntimeException{
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if (service.getId().equals(null)){</span>
+<span class="nc" id="L131">            throw new IllegalArgumentException(&quot;save: service id is null&quot;);</span>
+        }
+<span class="fc" id="L133">        String key = String.format(KEY, service.getId());</span>
+<span class="fc" id="L134">        service.setModifier(userDto);</span>
+<span class="fc" id="L135">        service.setGmtModified(LocalDateTime.now());</span>
+<span class="fc" id="L136">        ServicePo po = CloneFactory.copy(new ServicePo(),service);</span>
+<span class="fc" id="L137">        logger.debug(&quot;save: po = {}&quot;, po);</span>
+<span class="fc" id="L138">        this.servicePoMapper.save(po);</span>
+<span class="fc" id="L139">        build(po, key);</span>
+<span class="fc" id="L140">        return key;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: cn.edu.xmu.oomall.aftersale.dao.ArbitrationDaoTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 16.636 s - in cn.edu.xmu.oomall.aftersale.dao.ArbitrationDaoTest

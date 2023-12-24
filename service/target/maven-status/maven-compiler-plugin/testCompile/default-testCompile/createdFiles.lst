@@ -1,0 +1,8 @@
+cn\edu\xmu\oomall\service\controller\ServiceOrderControllerTest.class
+cn\edu\xmu\oomall\service\dao\ServiceOrderDaoTest.class
+cn\edu\xmu\oomall\service\dao\ProductServiceDaoTest.class
+cn\edu\xmu\oomall\service\controller\ShopServiceControllerTest.class
+cn\edu\xmu\oomall\service\dao\ServiceProviderDaoTest.class
+cn\edu\xmu\oomall\service\dao\ServiceDaoTest.class
+cn\edu\xmu\oomall\service\controller\ServiceProviderControllerTest.class
+cn\edu\xmu\oomall\service\ServiceTestApplication.class

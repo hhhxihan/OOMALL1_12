@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CloneFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.javaee.core.util</a> &gt; <span class="el_source">CloneFactory.java</span></div><h1>CloneFactory.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.javaee.core.util;
+
+import cn.edu.xmu.oomall.service.controller.dto.ServiceOrderDto;
+import cn.edu.xmu.oomall.service.controller.dto.ServiceOrdersDto;
+import cn.edu.xmu.oomall.service.controller.dto.ServiceProviderDto;
+import cn.edu.xmu.oomall.service.controller.vo.ServiceOrderVo;
+import cn.edu.xmu.oomall.service.controller.vo.ServiceProviderVo;
+import cn.edu.xmu.oomall.service.dao.bo.ProductService;
+import cn.edu.xmu.oomall.service.dao.bo.ServiceOrder;
+import cn.edu.xmu.oomall.service.dao.bo.ServiceProvider;
+import cn.edu.xmu.oomall.service.dao.bo.Services;
+import cn.edu.xmu.oomall.service.mapper.po.ProductServicePo;
+import cn.edu.xmu.oomall.service.mapper.po.ServiceOrderPo;
+import cn.edu.xmu.oomall.service.mapper.po.ServicePo;
+import cn.edu.xmu.oomall.service.mapper.po.ServiceProviderPo;
+
+<span class="nc" id="L17">public final class CloneFactory {</span>
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceOrderDto copy(ServiceOrderDto target, ServiceOrder source) {
+<span class="fc" id="L25">    target.setId(source.getId());</span>
+<span class="fc" id="L26">    target.setType(source.getType());</span>
+<span class="fc" id="L27">    target.setAddress(source.getAddress());</span>
+<span class="fc" id="L28">    target.setConsignee(source.getConsignee());</span>
+<span class="fc" id="L29">    target.setMobile(source.getMobile());</span>
+<span class="fc" id="L30">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L31">    target.setDescription(source.getDescription());</span>
+<span class="fc" id="L32">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L33">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L34">    target.setGmtReceived(source.getGmtReceived());</span>
+<span class="fc" id="L35">    target.setGmtEnd(source.getGmtEnd());</span>
+<span class="fc" id="L36">    target.setResult(source.getResult());</span>
+<span class="fc" id="L37">    target.setServiceProviderId(source.getServiceProviderId());</span>
+<span class="fc" id="L38">    target.setProductId(source.getProductId());</span>
+<span class="fc" id="L39">    target.setRegionId(source.getRegionId());</span>
+<span class="fc" id="L40">    target.setShopId(source.getShopId());</span>
+<span class="fc" id="L41">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ProductService copy(ProductService target, ProductServicePo source) {
+<span class="fc" id="L51">    target.setServiceId(source.getServiceId());</span>
+<span class="fc" id="L52">    target.setShopId(source.getShopId());</span>
+<span class="fc" id="L53">    target.setProductId(source.getProductId());</span>
+<span class="fc" id="L54">    target.setRegionId(source.getRegionId());</span>
+<span class="fc" id="L55">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L56">    target.setId(source.getId());</span>
+<span class="fc" id="L57">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L58">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L59">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L60">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L61">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L62">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L63">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceOrdersDto copy(ServiceOrdersDto target, ServiceOrder source) {
+<span class="nc" id="L73">    target.setId(source.getId());</span>
+<span class="nc" id="L74">    target.setType(source.getType());</span>
+<span class="nc" id="L75">    target.setDescription(source.getDescription());</span>
+<span class="nc" id="L76">    target.setProductId(source.getProductId());</span>
+<span class="nc" id="L77">    target.setRegionId(source.getRegionId());</span>
+<span class="nc" id="L78">    target.setShopId(source.getShopId());</span>
+<span class="nc" id="L79">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static Services copy(Services target, ServicePo source) {
+<span class="fc" id="L89">    target.setName(source.getName());</span>
+<span class="fc" id="L90">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L91">    target.setType(source.getType());</span>
+<span class="fc" id="L92">    target.setDescription(source.getDescription());</span>
+<span class="fc" id="L93">    target.setServiceProviderId(source.getServiceProviderId());</span>
+<span class="fc" id="L94">    target.setId(source.getId());</span>
+<span class="fc" id="L95">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L96">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L97">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L98">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L99">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L100">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L101">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceProvider copy(ServiceProvider target, ServiceProviderVo source) {
+<span class="fc" id="L111">    target.setName(source.getName());</span>
+<span class="fc" id="L112">    target.setConsignee(source.getConsignee());</span>
+<span class="fc" id="L113">    target.setMobile(source.getMobile());</span>
+<span class="fc" id="L114">    target.setAddress(source.getAddress());</span>
+<span class="fc" id="L115">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceProvider copy(ServiceProvider target, ServiceProviderPo source) {
+<span class="fc" id="L125">    target.setId(source.getId());</span>
+<span class="fc" id="L126">    target.setName(source.getName());</span>
+<span class="fc" id="L127">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L128">    target.setConsignee(source.getConsignee());</span>
+<span class="fc" id="L129">    target.setMobile(source.getMobile());</span>
+<span class="fc" id="L130">    target.setAddress(source.getAddress());</span>
+<span class="fc" id="L131">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L132">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L133">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L134">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L135">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L136">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L137">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServicePo copy(ServicePo target, Services source) {
+<span class="fc" id="L147">    target.setId(source.getId());</span>
+<span class="fc" id="L148">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L149">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L150">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L151">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L152">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L153">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L154">    target.setName(source.getName());</span>
+<span class="fc" id="L155">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L156">    target.setType(source.getType());</span>
+<span class="fc" id="L157">    target.setDescription(source.getDescription());</span>
+<span class="fc" id="L158">    target.setServiceProviderId(source.getServiceProviderId());</span>
+<span class="fc" id="L159">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceProviderPo copy(ServiceProviderPo target, ServiceProvider source) {
+<span class="fc" id="L169">    target.setId(source.getId());</span>
+<span class="fc" id="L170">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L171">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L172">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L173">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L174">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L175">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L176">    target.setName(source.getName());</span>
+<span class="fc" id="L177">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L178">    target.setConsignee(source.getConsignee());</span>
+<span class="fc" id="L179">    target.setMobile(source.getMobile());</span>
+<span class="fc" id="L180">    target.setAddress(source.getAddress());</span>
+<span class="fc" id="L181">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ProductServicePo copy(ProductServicePo target, ProductService source) {
+<span class="fc" id="L191">    target.setId(source.getId());</span>
+<span class="fc" id="L192">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L193">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L194">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L195">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L196">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L197">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L198">    target.setServiceId(source.getServiceId());</span>
+<span class="fc" id="L199">    target.setProductId(source.getProductId());</span>
+<span class="fc" id="L200">    target.setShopId(source.getShopId());</span>
+<span class="fc" id="L201">    target.setRegionId(source.getRegionId());</span>
+<span class="fc" id="L202">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L203">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceOrder copy(ServiceOrder target, ServiceOrderVo source) {
+<span class="fc" id="L213">    target.setId(source.getId());</span>
+<span class="fc" id="L214">    target.setType(source.getType());</span>
+<span class="fc" id="L215">    target.setAddress(source.getAddress());</span>
+<span class="fc" id="L216">    target.setConsignee(source.getConsignee());</span>
+<span class="fc" id="L217">    target.setMobile(source.getMobile());</span>
+<span class="fc" id="L218">    target.setMaintainerName(source.getMaintainerName());</span>
+<span class="fc" id="L219">    target.setMaintainerMobile(source.getMaintainerMobile());</span>
+<span class="fc" id="L220">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L221">    target.setDescription(source.getDescription());</span>
+<span class="fc" id="L222">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L223">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L224">    target.setGmtReceived(source.getGmtReceived());</span>
+<span class="fc" id="L225">    target.setGmtEnd(source.getGmtEnd());</span>
+<span class="fc" id="L226">    target.setResult(source.getResult());</span>
+<span class="fc" id="L227">    target.setServiceProviderId(source.getServiceProviderId());</span>
+<span class="fc" id="L228">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L229">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L230">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L231">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L232">    target.setProductId(source.getProductId());</span>
+<span class="fc" id="L233">    target.setRegionId(source.getRegionId());</span>
+<span class="fc" id="L234">    target.setShopId(source.getShopId());</span>
+<span class="fc" id="L235">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceOrder copy(ServiceOrder target, ServiceOrderPo source) {
+<span class="fc" id="L245">    target.setId(source.getId());</span>
+<span class="fc" id="L246">    target.setType(source.getType());</span>
+<span class="fc" id="L247">    target.setAddress(source.getAddress());</span>
+<span class="fc" id="L248">    target.setConsignee(source.getConsignee());</span>
+<span class="fc" id="L249">    target.setMobile(source.getMobile());</span>
+<span class="fc" id="L250">    target.setMaintainerName(source.getMaintainerName());</span>
+<span class="fc" id="L251">    target.setMaintainerMobile(source.getMaintainerMobile());</span>
+<span class="fc" id="L252">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L253">    target.setDescription(source.getDescription());</span>
+<span class="fc" id="L254">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L255">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L256">    target.setGmtReceived(source.getGmtReceived());</span>
+<span class="fc" id="L257">    target.setGmtEnd(source.getGmtEnd());</span>
+<span class="fc" id="L258">    target.setResult(source.getResult());</span>
+<span class="fc" id="L259">    target.setServiceProviderId(source.getServiceProviderId());</span>
+<span class="fc" id="L260">    target.setFreightExpressId(source.getFreightExpressId());</span>
+<span class="fc" id="L261">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L262">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L263">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L264">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L265">    target.setSerialNo(source.getSerialNo());</span>
+<span class="fc" id="L266">    target.setProductId(source.getProductId());</span>
+<span class="fc" id="L267">    target.setRegionId(source.getRegionId());</span>
+<span class="fc" id="L268">    target.setShopId(source.getShopId());</span>
+<span class="fc" id="L269">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceProviderDto copy(ServiceProviderDto target, ServiceProvider source) {
+<span class="fc" id="L279">    target.setId(source.getId());</span>
+<span class="fc" id="L280">    target.setName(source.getName());</span>
+<span class="fc" id="L281">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L282">    target.setConsignee(source.getConsignee());</span>
+<span class="fc" id="L283">    target.setMobile(source.getMobile());</span>
+<span class="fc" id="L284">    target.setAddress(source.getAddress());</span>
+<span class="fc" id="L285">    return target;</span>
+  }
+
+  /**
+   * Copy all fields from source to target
+   * @param target the target object
+   * @param source the source object
+   * @return the copied target object
+   */
+  public static ServiceOrderPo copy(ServiceOrderPo target, ServiceOrder source) {
+<span class="fc" id="L295">    target.setId(source.getId());</span>
+<span class="fc" id="L296">    target.setType(source.getType());</span>
+<span class="fc" id="L297">    target.setAddress(source.getAddress());</span>
+<span class="fc" id="L298">    target.setConsignee(source.getConsignee());</span>
+<span class="fc" id="L299">    target.setMobile(source.getMobile());</span>
+<span class="fc" id="L300">    target.setMaintainerName(source.getMaintainerName());</span>
+<span class="fc" id="L301">    target.setMaintainerMobile(source.getMaintainerMobile());</span>
+<span class="fc" id="L302">    target.setStatus(source.getStatus());</span>
+<span class="fc" id="L303">    target.setDescription(source.getDescription());</span>
+<span class="fc" id="L304">    target.setGmtCreate(source.getGmtCreate());</span>
+<span class="fc" id="L305">    target.setGmtModified(source.getGmtModified());</span>
+<span class="fc" id="L306">    target.setGmtReceived(source.getGmtReceived());</span>
+<span class="fc" id="L307">    target.setGmtEnd(source.getGmtEnd());</span>
+<span class="fc" id="L308">    target.setResult(source.getResult());</span>
+<span class="fc" id="L309">    target.setServiceProviderId(source.getServiceProviderId());</span>
+<span class="fc" id="L310">    target.setFreightExpressId(source.getFreightExpressId());</span>
+<span class="fc" id="L311">    target.setSerialNo(source.getSerialNo());</span>
+<span class="fc" id="L312">    target.setProductId(source.getProductId());</span>
+<span class="fc" id="L313">    target.setRegionId(source.getRegionId());</span>
+<span class="fc" id="L314">    target.setShopId(source.getShopId());</span>
+<span class="fc" id="L315">    target.setCreatorId(source.getCreatorId());</span>
+<span class="fc" id="L316">    target.setCreatorName(source.getCreatorName());</span>
+<span class="fc" id="L317">    target.setModifierId(source.getModifierId());</span>
+<span class="fc" id="L318">    target.setModifierName(source.getModifierName());</span>
+<span class="fc" id="L319">    return target;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

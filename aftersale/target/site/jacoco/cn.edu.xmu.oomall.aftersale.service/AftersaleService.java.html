@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AftersaleService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.service</a> &gt; <span class="el_source">AftersaleService.java</span></div><h1>AftersaleService.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.service;
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.oomall.aftersale.controller.dto.ApproveDto;
+import cn.edu.xmu.oomall.aftersale.controller.dto.OrderItemDto;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.javaee.core.mapper.RedisUtil;
+import cn.edu.xmu.oomall.aftersale.controller.dto.AftersaleDto;
+import cn.edu.xmu.oomall.aftersale.dao.AftersaleDao;
+import cn.edu.xmu.oomall.aftersale.dao.bo.Aftersale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+@Service
+@Transactional(propagation = Propagation.REQUIRED)
+@CopyFrom({OrderItemDto.class})
+public class AftersaleService {
+<span class="fc" id="L30">    private final Logger logger = LoggerFactory.getLogger(AftersaleService.class);</span>
+
+    @Value(&quot;${oomall.aftersale.timeout}&quot;)
+    private int timeout;
+
+    private final AftersaleDao aftersaleDao;
+    private final RedisUtil redisUtil;
+
+    @Autowired
+<span class="fc" id="L39">    public AftersaleService(AftersaleDao aftersaleDao, RedisUtil redisUtil) {</span>
+<span class="fc" id="L40">        this.aftersaleDao = aftersaleDao;</span>
+<span class="fc" id="L41">        this.redisUtil = redisUtil;</span>
+<span class="fc" id="L42">    }</span>
+
+
+    public Aftersale createAftersale(OrderItemDto dto, UserDto customer) {
+<span class="fc" id="L46">        Aftersale bo=aftersaleDao.findByOrderItemId(dto.getOrderItemId());</span>
+<span class="fc" id="L47">        Aftersale aftersale1=CloneFactory.copy(new Aftersale(),dto);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if(null==bo){</span>
+<span class="fc" id="L49">            Aftersale aftersale=new Aftersale();</span>
+<span class="fc" id="L50">            aftersale.setAftersaleDao(this.aftersaleDao);</span>
+<span class="fc" id="L51">            return aftersale.createAftersale(aftersale1,customer);</span>
+        }
+        else {
+<span class="fc" id="L54">            throw new BusinessException(ReturnNo.AFTERSALE_ISEXISTING, String.format(ReturnNo.AFTERSALE_ISEXISTING.getMessage()));</span>
+        }
+
+    }
+
+    public Boolean approveAftersale(Long id, ApproveDto dto, UserDto user){
+<span class="fc" id="L60">        Aftersale bo=aftersaleDao.findById(id);</span>
+<span class="pc bpc" id="L61" title="1 of 2 branches missed.">        if(bo.getStatus()!=Aftersale.APPLY){</span>
+<span class="fc" id="L62">            bo.approve(dto,user);</span>
+<span class="fc" id="L63">            return true;</span>
+        }
+        else{
+<span class="nc" id="L66">            throw new BusinessException(ReturnNo.AFTERSALE_APPROVEFALIED, String.format(ReturnNo.AFTERSALE_APPROVEFALIED.getMessage()));</span>
+        }
+    }
+
+//    /**
+//     * 通过id更新售后单
+//     *
+//     * @param aftersale 地区
+//     * @param user      登录用户
+//     */
+//
+//    public void updateById(Aftersale aftersale, UserDto user) {
+//        Aftersale bo = this.aftersaleDao.findById(aftersale.getId());
+//        logger.debug(&quot;updateRegionById: bo = {}&quot;, bo);
+//
+//        String key = this.aftersaleDao.save(aftersale, user);
+//        this.redisUtil.del(key);
+//    }
+//
+//    /**
+//     * 根据id删除售后单
+//     *
+//     * @param id 售后单id
+//     */
+//    public void deleteRegion(Long id) {
+//
+//        String key = this.aftersaleDao.deleteById(id);
+//        this.redisUtil.del(key);
+//    }
+//
+//
+//    /**
+//     * 获取所有售后单状态
+//     *
+//     * @return
+//     */
+//    public List&lt;StatusDto&gt; retrieveRegionsStates() {
+//        return Aftersale.STATUSNAMES.keySet().stream().map(key -&gt; new StatusDto(key, Aftersale.STATUSNAMES.get(key))).collect(Collectors.toList());
+//    }
+//
+//    /**
+//     * 通过id查找地区
+//     *
+//     * @param id 地区id
+//     * @return RegionDto
+//     */
+//    public Aftersale findById(Long id) {
+//        logger.debug(&quot;findRegionById: id = {}&quot;, id);
+//        return this.aftersaleDao.findById(id);
+//    }
+//
+//    /**
+//     * 通过shopid查找售后单
+//     *
+//     * @return List&lt;Aftersale&gt;
+//     */
+//    public List&lt;Aftersale&gt; findByShopId(Long id, Integer page, Integer pageSize) {
+//        logger.debug(&quot;findAftersaleByShopId: id = {}&quot;, id);
+//        return this.aftersaleDao.findAftersaleByShopId(id, true, page, pageSize);
+//    }
+//
+//    /**
+//     * 通过customerid查找售后单
+//     *
+//     * @return List&lt;Aftersale&gt;
+//     */
+//    public List&lt;Aftersale&gt; findByCustomerId(Long id, Integer page, Integer pageSize) {
+//        logger.debug(&quot;findAftersaleByShopId: id = {}&quot;, id);
+//        return this.aftersaleDao.findAftersaleByCustomerId(id, true, page, pageSize);
+//    }
+//
+//    public List&lt;Aftersale&gt; findByServiceId(Long id, Integer page, Integer pageSize) {
+//        logger.debug(&quot;findAftersaleByShopId: id = {}&quot;, id);
+//        return this.aftersaleDao.findAftersaleByServiceId(id, true, page, pageSize);
+//    }
+//
+//    public String createAftersale(List&lt;OrderItemVo&gt; items, AftersaleDto dto, UserDto customer) {
+//
+//        Aftersale bo = CloneFactory.copy(new Aftersale(), dto);
+//        return new String(aftersaleDao.save(bo, customer));
+//
+//    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

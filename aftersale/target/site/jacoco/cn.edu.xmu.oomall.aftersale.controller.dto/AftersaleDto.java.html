@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AftersaleDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.controller.dto</a> &gt; <span class="el_source">AftersaleDto.java</span></div><h1>AftersaleDto.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.controller.dto;
+
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+
+import cn.edu.xmu.oomall.aftersale.dao.bo.Aftersale;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+<span class="nc" id="L15">@NoArgsConstructor</span>
+@CopyFrom({Aftersale.class})
+public class AftersaleDto {
+    private Long id;
+    private Long orderItemId;
+    private Long customerId;
+    private Long shopId;
+    private String aftersaleSn;
+    private Byte type;
+    private String reason;
+    private String conclusion;
+    private Integer quantity;
+    private Long regionId;
+    private String address;
+    private String consignee;
+    private String mobile;
+    private Byte status;
+    private Long serviceId;
+    private String serialNo;
+    private String name;
+    private Long creatorId;
+    private String creatorName;
+    private Long modifierId;
+    private String modifierName;
+    private LocalDateTime gmtCreate;
+    private LocalDateTime gmtModified;
+    private Integer inArbitrated;
+
+    public AftersaleDto(Aftersale aftersale) {
+<span class="nc" id="L44">        super();</span>
+//        CloneFactory.copy(this, aftersale);
+//        //设置返回对象属性
+//        this.setShop1(IdNameTypeDto.builder().id(product.getShop().getId()).name(product.getShop().getName()).build());
+//        this.setOtherProducts1(product.getOtherProduct().stream().map(o -&gt; IdNameTypeDto.builder().id(o.getId()).name(o.getName()).build()).collect(Collectors.toList()));
+//        this.setCategory1(IdNameTypeDto.builder().id(product.getCategory().getId()).name(product.getCategory().getName()).build());
+//        this.setTemplate1(IdNameTypeDto.builder().id(product.getTemplate().getId()).name(product.getTemplate().getName()).build());
+//        this.setCreator(IdNameTypeDto.builder().id(product.getCreatorId()).name(product.getCreatorName()).build());
+//        this.setModifier(IdNameTypeDto.builder().id(product.getModifierId()).name(product.getModifierName()).build());
+//    }
+
+
+<span class="nc" id="L56">    }</span>
+
+    public Long getId() {
+<span class="nc" id="L59">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="nc" id="L63">        this.id = id;</span>
+<span class="nc" id="L64">    }</span>
+
+    public Long getOrderItemId() {
+<span class="nc" id="L67">        return orderItemId;</span>
+    }
+
+    public void setOrderItemId(Long orderItemId) {
+<span class="nc" id="L71">        this.orderItemId = orderItemId;</span>
+<span class="nc" id="L72">    }</span>
+
+    public Long getCustomerId() {
+<span class="nc" id="L75">        return customerId;</span>
+    }
+
+    public void setCustomerId(Long customerId) {
+<span class="nc" id="L79">        this.customerId = customerId;</span>
+<span class="nc" id="L80">    }</span>
+
+    public Long getShopId() {
+<span class="nc" id="L83">        return shopId;</span>
+    }
+
+    public void setShopId(Long shopId) {
+<span class="nc" id="L87">        this.shopId = shopId;</span>
+<span class="nc" id="L88">    }</span>
+
+    public String getAftersaleSn() {
+<span class="nc" id="L91">        return aftersaleSn;</span>
+    }
+
+    public void setAftersaleSn(String aftersaleSn) {
+<span class="nc" id="L95">        this.aftersaleSn = aftersaleSn;</span>
+<span class="nc" id="L96">    }</span>
+
+    public Byte getType() {
+<span class="nc" id="L99">        return type;</span>
+    }
+
+    public void setType(Byte type) {
+<span class="nc" id="L103">        this.type = type;</span>
+<span class="nc" id="L104">    }</span>
+
+    public String getReason() {
+<span class="nc" id="L107">        return reason;</span>
+    }
+
+    public void setReason(String reason) {
+<span class="nc" id="L111">        this.reason = reason;</span>
+<span class="nc" id="L112">    }</span>
+
+    public String getConclusion() {
+<span class="nc" id="L115">        return conclusion;</span>
+    }
+
+    public void setConclusion(String conclusion) {
+<span class="nc" id="L119">        this.conclusion = conclusion;</span>
+<span class="nc" id="L120">    }</span>
+
+    public Integer getQuantity() {
+<span class="nc" id="L123">        return quantity;</span>
+    }
+
+    public void setQuantity(Integer quantity) {
+<span class="nc" id="L127">        this.quantity = quantity;</span>
+<span class="nc" id="L128">    }</span>
+
+    public Long getRegionId() {
+<span class="nc" id="L131">        return regionId;</span>
+    }
+
+    public void setRegionId(Long regionId) {
+<span class="nc" id="L135">        this.regionId = regionId;</span>
+<span class="nc" id="L136">    }</span>
+
+    public String getAddress() {
+<span class="nc" id="L139">        return address;</span>
+    }
+
+    public void setAddress(String address) {
+<span class="nc" id="L143">        this.address = address;</span>
+<span class="nc" id="L144">    }</span>
+
+    public String getConsignee() {
+<span class="nc" id="L147">        return consignee;</span>
+    }
+
+    public void setConsignee(String consignee) {
+<span class="nc" id="L151">        this.consignee = consignee;</span>
+<span class="nc" id="L152">    }</span>
+
+    public String getMobile() {
+<span class="nc" id="L155">        return mobile;</span>
+    }
+
+    public void setMobile(String mobile) {
+<span class="nc" id="L159">        this.mobile = mobile;</span>
+<span class="nc" id="L160">    }</span>
+
+    public Byte getStatus() {
+<span class="nc" id="L163">        return status;</span>
+    }
+
+    public void setStatus(Byte status) {
+<span class="nc" id="L167">        this.status = status;</span>
+<span class="nc" id="L168">    }</span>
+
+    public Long getServiceId() {
+<span class="nc" id="L171">        return serviceId;</span>
+    }
+
+    public void setServiceId(Long serviceId) {
+<span class="nc" id="L175">        this.serviceId = serviceId;</span>
+<span class="nc" id="L176">    }</span>
+
+    public String getSerialNo() {
+<span class="nc" id="L179">        return serialNo;</span>
+    }
+
+    public void setSerialNo(String serialNo) {
+<span class="nc" id="L183">        this.serialNo = serialNo;</span>
+<span class="nc" id="L184">    }</span>
+
+    public String getName() {
+<span class="nc" id="L187">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="nc" id="L191">        this.name = name;</span>
+<span class="nc" id="L192">    }</span>
+
+    public Long getCreatorId() {
+<span class="nc" id="L195">        return creatorId;</span>
+    }
+
+    public void setCreatorId(Long creatorId) {
+<span class="nc" id="L199">        this.creatorId = creatorId;</span>
+<span class="nc" id="L200">    }</span>
+
+    public String getCreatorName() {
+<span class="nc" id="L203">        return creatorName;</span>
+    }
+
+    public void setCreatorName(String creatorName) {
+<span class="nc" id="L207">        this.creatorName = creatorName;</span>
+<span class="nc" id="L208">    }</span>
+
+    public Long getModifierId() {
+<span class="nc" id="L211">        return modifierId;</span>
+    }
+
+    public void setModifierId(Long modifierId) {
+<span class="nc" id="L215">        this.modifierId = modifierId;</span>
+<span class="nc" id="L216">    }</span>
+
+    public String getModifierName() {
+<span class="nc" id="L219">        return modifierName;</span>
+    }
+
+    public void setModifierName(String modifierName) {
+<span class="nc" id="L223">        this.modifierName = modifierName;</span>
+<span class="nc" id="L224">    }</span>
+
+    public LocalDateTime getGmtCreate() {
+<span class="nc" id="L227">        return gmtCreate;</span>
+    }
+
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+<span class="nc" id="L231">        this.gmtCreate = gmtCreate;</span>
+<span class="nc" id="L232">    }</span>
+
+    public LocalDateTime getGmtModified() {
+<span class="nc" id="L235">        return gmtModified;</span>
+    }
+
+    public void setGmtModified(LocalDateTime gmtModified) {
+<span class="nc" id="L239">        this.gmtModified = gmtModified;</span>
+<span class="nc" id="L240">    }</span>
+
+    public Integer getInArbitrated() {
+<span class="nc" id="L243">        return inArbitrated;</span>
+    }
+
+    public void setInArbitrated(Integer inArbitrated) {
+<span class="nc" id="L247">        this.inArbitrated = inArbitrated;</span>
+<span class="nc" id="L248">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

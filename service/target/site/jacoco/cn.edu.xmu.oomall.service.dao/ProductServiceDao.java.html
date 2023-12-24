@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductServiceDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.dao</a> &gt; <span class="el_source">ProductServiceDao.java</span></div><h1>ProductServiceDao.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.dao;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.mapper.RedisUtil;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.oomall.service.dao.bo.ProductService;
+import cn.edu.xmu.oomall.service.dao.bo.Services;
+import cn.edu.xmu.oomall.service.mapper.ProductServicePoMapper;
+import cn.edu.xmu.oomall.service.mapper.po.ProductServicePo;
+import cn.edu.xmu.oomall.service.dao.ServiceDao;
+import cn.edu.xmu.oomall.service.mapper.po.ServicePo;
+import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static cn.edu.xmu.javaee.core.model.Constants.IDNOTEXIST;
+
+@Repository
+@RefreshScope
+public class ProductServiceDao {
+<span class="fc" id="L37">    private static final Logger logger = LoggerFactory.getLogger(ServiceDao.class);</span>
+
+    public static final String KEY = &quot;A%d&quot;;
+
+    @Value(&quot;${oomall.service.timeout}&quot;)
+    private long timeout;
+
+    private RedisUtil redisUtil;
+
+    private ProductServicePoMapper productServicePoMapper;
+    @Lazy
+    private ServiceDao serviceDao;
+
+    private ProductServiceDao productServiceDao;
+
+    @Autowired
+    @Lazy
+<span class="fc" id="L54">    public ProductServiceDao(ProductServicePoMapper productServicePoMapper, ProductServiceDao productServiceDao,ServiceDao serviceDao, RedisUtil redisUtil) {</span>
+<span class="fc" id="L55">        this.productServicePoMapper = productServicePoMapper;</span>
+<span class="fc" id="L56">        this.serviceDao = serviceDao;</span>
+<span class="fc" id="L57">        this.productServiceDao = productServiceDao;</span>
+
+<span class="fc" id="L59">        this.redisUtil = redisUtil;</span>
+<span class="fc" id="L60">    }</span>
+
+    public ProductService build(ProductServicePo po, String redisKey) {
+<span class="fc" id="L63">        ProductService bo = CloneFactory.copy(new ProductService(), po);</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (null != redisKey) {</span>
+<span class="fc" id="L65">            redisUtil.set(redisKey, bo, timeout);</span>
+        }
+<span class="fc" id="L67">        this.build(bo);</span>
+<span class="fc" id="L68">        return bo;</span>
+    }
+    private ProductService build(ProductService bo) {
+<span class="fc" id="L71">        bo.setProductServiceDao(this);</span>
+<span class="fc" id="L72">        bo.setServiceDao(this.serviceDao);</span>
+<span class="fc" id="L73">        return bo;</span>
+    }
+
+    public ProductService findById(Long id){
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (id.equals(null)) {</span>
+<span class="nc" id="L78">            throw new IllegalArgumentException(&quot;findById: id is null&quot;);</span>
+        }
+<span class="fc" id="L80">        logger.debug(&quot;findObjById: id = {}&quot;,id);</span>
+<span class="fc" id="L81">        String key = String.format(KEY, id);</span>
+<span class="fc" id="L82">        ProductService productService = (ProductService) redisUtil.get(key);</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        if (!Objects.isNull(productService)) {</span>
+<span class="nc" id="L84">            productService = this.build(productService);</span>
+        } else {
+<span class="fc" id="L86">            Optional&lt;ProductServicePo&gt; ret = this.productServicePoMapper.findById(id);</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">            if (ret.isPresent()){</span>
+<span class="fc" id="L88">                productService = this.build(ret.get(), key);</span>
+            }else{
+<span class="nc" id="L90">                throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;商品服务&quot;, id));</span>
+            }
+        }
+<span class="fc" id="L93">        return productService;</span>
+    }
+
+    /**
+     * 按照服务和商铺找到对象
+     */
+    public List&lt;ProductService&gt; findByServiceIdAndShopId(Long serviceId, Long shopId,  Integer page, Integer pageSize) throws RuntimeException{
+<span class="fc" id="L100">        List&lt;ProductService&gt; ret = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if (null == serviceId) {</span>
+<span class="nc" id="L102">            throw new IllegalArgumentException(&quot;serviceId can not be null.&quot;);</span>
+        }
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (null == shopId) {</span>
+<span class="nc" id="L105">            throw new IllegalArgumentException(&quot;shopId can not be null.&quot;);</span>
+        }
+<span class="fc" id="L107">        Pageable pageable = PageRequest.of(page-1, pageSize);</span>
+<span class="fc" id="L108">        List&lt;ProductServicePo&gt; pos = this.productServicePoMapper.findByServiceIdEqualsAndShopIdEquals(serviceId,shopId,pageable);</span>
+<span class="fc" id="L109">        ret = pos.stream().map(po -&gt; CloneFactory.copy(new ProductService(),po)).collect(Collectors.toList());</span>
+<span class="fc" id="L110">        logger.info(&quot;bos size:{}&quot;, ret.size());</span>
+<span class="fc" id="L111">        return ret;</span>
+    }
+
+    /**
+     * 按照服务和状态找到对象
+     */
+    public List&lt;ProductService&gt; findByServiceIdAndStatus(Long serviceId, Integer page, Integer pageSize) throws RuntimeException{
+<span class="fc" id="L118">        List&lt;ProductService&gt; ret = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        if (null == serviceId) {</span>
+<span class="nc" id="L120">            throw new IllegalArgumentException(&quot;serviceId can not be null.&quot;);</span>
+        }
+
+<span class="fc" id="L123">        Pageable pageable = PageRequest.of(page-1, pageSize);</span>
+<span class="fc" id="L124">        List&lt;ProductServicePo&gt; pos = this.productServicePoMapper.findByServiceIdEqualsAndStatusEquals(serviceId,ProductService.VALID,pageable);</span>
+<span class="fc" id="L125">        ret = pos.stream().map(po -&gt; CloneFactory.copy(new ProductService(),po)).collect(Collectors.toList());</span>
+<span class="fc" id="L126">        logger.info(&quot;bos size:{}&quot;, ret.size());</span>
+<span class="fc" id="L127">        return ret;</span>
+    }
+
+    /**
+     * 按照服务、地区和商铺找到对象
+     */
+    public List&lt;ProductService&gt; findByProductIdAndRegionIdAndShopIdAndStatus(Long productId, Long regionId, Long shopId,  Integer page, Integer pageSize) throws RuntimeException{
+<span class="fc" id="L134">        List&lt;ProductService&gt; ret = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">        if (null == productId) {</span>
+<span class="nc" id="L136">            throw new IllegalArgumentException(&quot;productId can not be null.&quot;);</span>
+        }
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (null == regionId) {</span>
+<span class="nc" id="L139">            throw new IllegalArgumentException(&quot;regionId can not be null.&quot;);</span>
+        }
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">        if (null == shopId) {</span>
+<span class="nc" id="L142">            throw new IllegalArgumentException(&quot;shopId can not be null.&quot;);</span>
+        }
+<span class="fc" id="L144">        Pageable pageable = PageRequest.of(page-1, pageSize);</span>
+<span class="fc" id="L145">        List&lt;ProductServicePo&gt; pos = this.productServicePoMapper.findByProductIdEqualsAndRegionIdEqualsAndShopIdEquals(productId,regionId,shopId,pageable);</span>
+<span class="fc" id="L146">        ret = pos.stream().map(po -&gt; CloneFactory.copy(new ProductService(),po)).collect(Collectors.toList());</span>
+<span class="fc" id="L147">        logger.info(&quot;bos size:{}&quot;, ret.size());</span>
+<span class="fc" id="L148">        return ret;</span>
+    }
+
+    /**
+     * 商户选择服务
+     */
+    public ProductService insert(ProductService productService, UserDto userDto) throws RuntimeException{
+<span class="fc" id="L155">        productService.setCreator(userDto);</span>
+<span class="fc" id="L156">        productService.setGmtCreate(LocalDateTime.now());</span>
+<span class="fc" id="L157">        productService.setStatus(ProductService.VALID);</span>
+<span class="fc" id="L158">        ProductServicePo po = CloneFactory.copy(new ProductServicePo(), productService);</span>
+<span class="fc" id="L159">        po.setId(null);</span>
+<span class="fc" id="L160">        logger.debug(&quot;insert: po = {}&quot;, po);</span>
+<span class="fc" id="L161">        this.productServicePoMapper.save(po);</span>
+<span class="fc" id="L162">        productService.setId(po.getId());</span>
+<span class="fc" id="L163">        return productService;</span>
+    }
+
+    /**
+     * 商户修改服务
+     */
+    public String save(ProductService productService, UserDto userDto) throws RuntimeException{
+<span class="pc bpc" id="L170" title="1 of 2 branches missed.">        if (productService.getId().equals(null)){</span>
+<span class="nc" id="L171">            throw new IllegalArgumentException(&quot;save: productService id is null&quot;);</span>
+        }
+<span class="fc" id="L173">        String key = String.format(KEY, productService.getId());</span>
+<span class="fc" id="L174">        productService.setModifier(userDto);</span>
+<span class="fc" id="L175">        productService.setGmtModified(LocalDateTime.now());</span>
+<span class="fc" id="L176">        ProductServicePo po = CloneFactory.copy(new ProductServicePo(),productService);</span>
+<span class="fc" id="L177">        logger.debug(&quot;save: po = {}&quot;, po);</span>
+<span class="fc" id="L178">        this.productServicePoMapper.save(po);</span>
+<span class="fc" id="L179">        build(po, key);</span>
+<span class="fc" id="L180">        return key;</span>
+    }
+
+    /**
+     * 商户取消服务
+     */
+    public void delete(Long id) throws RuntimeException {
+<span class="pc bpc" id="L187" title="1 of 2 branches missed.">        if (!this.productServicePoMapper.existsById(id))</span>
+<span class="nc" id="L188">            throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;商品类目&quot;, id));</span>
+<span class="fc" id="L189">        this.productServicePoMapper.deleteById(id);</span>
+<span class="fc" id="L190">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

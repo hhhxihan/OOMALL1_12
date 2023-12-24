@@ -1,0 +1,7 @@
+cn/edu/xmu/oomall/aftersale/controller/CustomerArbitrationControllerTest.class
+cn/edu/xmu/oomall/aftersale/controller/AdminRegionControllerTest.class
+cn/edu/xmu/oomall/aftersale/controller/InternalRegionControllerTest.class
+cn/edu/xmu/oomall/aftersale/dao/ArbitrationDaoTest.class
+cn/edu/xmu/oomall/aftersale/controller/CustomerAftersaleControllerTest.class
+cn/edu/xmu/oomall/aftersale/dao/AftersaleDaoTest.class
+cn/edu/xmu/oomall/aftersale/controller/ShopAftersaleControllerTest.class

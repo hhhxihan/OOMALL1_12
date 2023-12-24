@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShopAftersaleController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.controller</a> &gt; <span class="el_source">ShopAftersaleController.java</span></div><h1>ShopAftersaleController.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.controller;
+
+import cn.edu.xmu.oomall.aftersale.controller.dto.ApproveDto;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.javaee.core.aop.Audit;
+import cn.edu.xmu.javaee.core.aop.LoginUser;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
+import cn.edu.xmu.javaee.core.model.dto.IdNameTypeDto;
+import cn.edu.xmu.javaee.core.model.dto.PageDto;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+
+import cn.edu.xmu.oomall.aftersale.controller.vo.ApproveVo;
+import cn.edu.xmu.oomall.aftersale.dao.bo.Aftersale;
+import cn.edu.xmu.oomall.aftersale.service.AftersaleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+
+@RestController /*Restful的Controller对象*/
+@RequestMapping(value = &quot;/aftersales&quot;, produces = &quot;application/json;charset=UTF-8&quot;)
+public class ShopAftersaleController {
+
+<span class="fc" id="L29">    private final Logger logger = LoggerFactory.getLogger(ShopAftersaleController.class);</span>
+    private final AftersaleService aftersaleService;
+
+    @Autowired
+<span class="fc" id="L33">    public ShopAftersaleController(AftersaleService aftersaleService) {</span>
+<span class="fc" id="L34">        this.aftersaleService = aftersaleService;</span>
+<span class="fc" id="L35">    }</span>
+
+    //审核售后单
+    @PutMapping(&quot;/{id}/approve&quot;)
+//    @Audit(departName = &quot;shops&quot;)
+    public ReturnObject approveAftersale(@PathVariable Long id, ApproveVo vo,@LoginUser UserDto user) {
+<span class="fc" id="L41">        ApproveDto dto=CloneFactory.copy(new ApproveDto(),vo);</span>
+<span class="fc" id="L42">        aftersaleService.approveAftersale(id,dto,user);</span>
+<span class="fc" id="L43">        return new ReturnObject(ReturnNo.OK);</span>
+    }
+//
+//    //根据id查询售后单
+//    @GetMapping(&quot;/shopInquire/{id}&quot;)
+//    //@Audit(departName = &quot;shops&quot;)  //, @LoginUser UserDto user
+//    public ReturnObject getsAftersaleById(@PathVariable Long id) {
+//
+//        Aftersale aftersale = this.aftersaleService.findById(id);
+//        return new ReturnObject(CloneFactory.copy(new AftersaleDto(), aftersale));
+//    }
+//
+//    //获取所有的售后单
+//    @GetMapping(&quot;/shop/{did}/&quot;)
+////    @Audit(departName = &quot;shops&quot;)
+//    public ReturnObject getsAllAftersaleById(@PathVariable Long did,
+//                                             @RequestParam(required = false, defaultValue = &quot;1&quot;) Integer page,
+//                                             @RequestParam(required = false, defaultValue = &quot;10&quot;) Integer pageSize) {
+//
+//        List&lt;Aftersale&gt; aftersaleList = this.aftersaleService.findByShopId(did, page, pageSize);
+//        return new ReturnObject(new PageDto&lt;&gt;(aftersaleList.stream().map(o -&gt; IdNameTypeDto.builder().id(o.getId()).name(o.getName()).build()).collect(Collectors.toList()), page, pageSize));
+//    }
+//
+
+//
+//    //取消售后单
+//    @PutMapping(&quot;/shop/{id}/cancle&quot;)
+////    @Audit(departName = &quot;shops&quot;) , @LoginUser UserDto user
+//    public ReturnObject cancleAftersale(@PathVariable Long id, CancleVo vo) {
+//        Aftersale aftersale = aftersaleService.findById(id);
+//        UserDto user=new UserDto();
+//        if (!aftersale.beFinsh(user)) {
+//            throw new BusinessException(ReturnNo.RESOURCE_ID_OUTSCOPE, String.format(ReturnNo.RESOURCE_ID_OUTSCOPE.getMessage(), &quot;状态不能改变&quot;, id));
+//        }
+//        aftersale.setConclusion(vo.getConclusion());
+//        return new ReturnObject(ReturnNo.OK);
+//    }
+
+//    //确认收货
+//    @PutMapping(&quot;/{did}/recieve/{id}&quot;)
+////    @Audit(departName = &quot;shops&quot;)
+//    public ReturnObject recieveConfirm(@PathVariable Long did, @PathVariable Long id,
+//                                       ApproveVo vo, @LoginUser UserDto user) {
+//
+//
+//        return new ReturnObject(ReturnNo.OK);
+//    }
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

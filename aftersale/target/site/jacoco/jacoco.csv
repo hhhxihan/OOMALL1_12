@@ -1,0 +1,34 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+aftersale,cn.edu.xmu.oomall.aftersale.controller.dto,ArbitrationDto,0,115,0,0,0,49,0,33,0,33
+aftersale,cn.edu.xmu.oomall.aftersale.controller.dto,OrderItemDto,0,59,0,0,0,25,0,17,0,17
+aftersale,cn.edu.xmu.oomall.aftersale.controller.dto,AftersaleDto,174,0,0,0,75,0,50,0,50,0
+aftersale,cn.edu.xmu.oomall.aftersale.controller.dto,ApproveDto,0,17,0,0,0,7,0,5,0,5
+aftersale,cn.edu.xmu.oomall.aftersale.dao.openfeign,OrderItemDao,3,0,0,0,1,0,1,0,1,0
+aftersale,cn.edu.xmu.oomall.aftersale.controller,CustomerAftersaleController,0,38,0,0,0,9,0,2,0,2
+aftersale,cn.edu.xmu.oomall.aftersale.controller,CustomerArbitrationController,0,45,0,0,0,10,0,3,0,3
+aftersale,cn.edu.xmu.oomall.aftersale.controller,ShopAftersaleController,0,28,0,0,0,7,0,2,0,2
+aftersale,cn.edu.xmu.oomall.aftersale.controller,AdminAftersaleController,0,10,0,0,0,4,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao,AftersaleDao,64,224,6,8,11,48,6,10,0,9
+aftersale,cn.edu.xmu.oomall.aftersale.dao,ArbitrationDao,52,200,3,7,7,40,2,12,0,9
+aftersale,cn.edu.xmu.oomall.aftersale.mapper.po,AftersalePo,127,171,0,0,2,73,2,49,2,49
+aftersale,cn.edu.xmu.oomall.aftersale.mapper.po,ArbitrationPo,89,115,0,0,2,49,2,33,2,33
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Aftersale.2.new HashSet() {...},0,14,0,0,0,4,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Aftersale.2.new HashSet() {...},0,18,0,0,0,5,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Aftersale.2.new HashSet() {...},0,10,0,0,0,3,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Arbitration.new HashMap() {...},0,28,0,0,0,7,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Arbitration.new HashMap() {...},0,35,0,0,0,6,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Arbitration,107,212,4,6,4,67,6,38,2,37
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Aftersale.new HashMap() {...},0,27,0,0,0,5,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Aftersale.new HashMap() {...},0,23,0,0,0,6,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Aftersale,259,364,12,10,16,123,18,60,7,60
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Arbitration.2.new HashSet() {...},0,10,0,0,0,3,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Arbitration.2.new HashSet() {...},0,10,0,0,0,3,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Arbitration.2.new HashSet() {...},0,10,0,0,0,3,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.dao.bo,Arbitration.2.new HashSet() {...},0,10,0,0,0,3,0,1,0,1
+aftersale,cn.edu.xmu.oomall.aftersale.service,AftersaleService,10,67,1,3,1,16,1,4,0,3
+aftersale,cn.edu.xmu.oomall.aftersale.service,ArbitrationService,0,53,0,0,0,15,0,3,0,3
+aftersale,cn.edu.xmu.oomall.aftersale,AftersaleApplication,5,3,0,0,2,1,1,1,1,1
+aftersale,cn.edu.xmu.javaee.core.util,CloneFactory,103,508,0,0,27,132,3,10,3,10
+aftersale,cn.edu.xmu.oomall.aftersale.controller.vo,OrderItemVo,0,32,0,0,0,12,0,10,0,10
+aftersale,cn.edu.xmu.oomall.aftersale.controller.vo,ApproveVo,8,9,0,0,4,3,2,3,2,3
+aftersale,cn.edu.xmu.oomall.aftersale.controller.vo,ArbitrationVo,6,10,0,0,1,4,1,3,1,3

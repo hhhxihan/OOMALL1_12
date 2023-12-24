@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.dao.bo</a> &gt; <span class="el_source">ServiceProvider.java</span></div><h1>ServiceProvider.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.dao.bo;
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.javaee.core.model.bo.OOMallObject;
+import cn.edu.xmu.oomall.service.controller.vo.ServiceProviderVo;
+import cn.edu.xmu.oomall.service.dao.ServiceProviderDao;
+import cn.edu.xmu.oomall.service.mapper.po.ServiceProviderPo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+<span class="nc" id="L20">@ToString(callSuper = true, doNotUseGetters = true)</span>
+<span class="fc" id="L21">@NoArgsConstructor</span>
+@CopyFrom({ServiceProviderVo.class,  ServiceProviderPo.class})
+public class ServiceProvider extends OOMallObject implements Serializable {
+    // 申请
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L27">    public static final Byte NEW = 0;</span>
+    // 有效
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L31">    public static final Byte VALID = 1;</span>
+    // 暂停
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L35">    public static final Byte PAUSE = 2;</span>
+    // 停用
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L39">    public static final Byte ABANDON = 3;</span>
+
+    /**
+     * 状态和名称的对应
+     */
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L46">    public static final Map&lt;Byte, String&gt; STATUSNAMES = new HashMap() {</span>
+        {
+<span class="fc" id="L48">            put(NEW, &quot;申请&quot;);</span>
+<span class="fc" id="L49">            put(VALID, &quot;有效&quot;);</span>
+<span class="fc" id="L50">            put(PAUSE, &quot;暂停&quot;);</span>
+<span class="fc" id="L51">            put(ABANDON, &quot;停用&quot;);</span>
+<span class="fc" id="L52">        }</span>
+    };
+
+    /*
+    // 允许的状态迁移
+    @JsonIgnore
+    @ToString.Exclude
+    private static final Map&lt;Byte, Set&lt;Byte&gt;&gt; toStatus = new HashMap&lt;&gt;() {
+        {
+            put(NEW, new HashSet&lt;&gt;() {
+                {
+                    add(VALID);
+                }
+            });
+            put(PAUSE, new HashSet&lt;&gt;() {
+                {
+                    add(VALID);
+                    add(ABANDON);
+                }
+            });
+            put(VALID, new HashSet&lt;&gt;() {
+                {
+                    add(PAUSE);
+                }
+            });
+        }
+    };
+    */
+
+    /*
+    // 是否允许状态迁移
+    public boolean allowStatus(Byte status) {
+        boolean ret = false;
+
+        if (null != status &amp;&amp; null != this.status) {
+            Set&lt;Byte&gt; allowStatusSet = toStatus.get(this.status);
+            if (null != allowStatusSet) {
+                ret = allowStatusSet.contains(status);
+            }
+        }
+        return ret;
+    }
+     */
+
+    // 获得当前状态名称
+    @JsonIgnore
+    public String getStatusName() {
+<span class="nc" id="L99">        return STATUSNAMES.get(this.status);</span>
+    }
+
+    private Long id;
+
+    // 服务商名称
+    private String name;
+
+    // 服务商状态
+    private Byte status;
+
+    // 联系人姓名
+    private String consignee;
+
+    // 详细地址
+    private String address;
+
+    // 联系人电话
+    private String mobile;
+
+    @ToString.Exclude
+    @JsonIgnore
+    private ServiceProvider serviceProvider;
+
+<span class="fc" id="L123">    @Setter</span>
+    @JsonIgnore
+    @ToString.Exclude
+    private ServiceProviderDao serviceProviderDao;
+
+    /**
+     * 创建者id
+     */
+    private Long creatorId;
+
+    /**
+     * 创建者
+     */
+    private String creatorName;
+
+    /**
+     * 修改者id
+     */
+    private Long modifierId;
+
+    /**
+     * 修改者
+     */
+    private String modifierName;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime gmtCreate;
+
+    /**
+     * 修改时间
+     */
+    private LocalDateTime gmtModified;
+    public Long getId() {
+<span class="fc" id="L158">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L162">        this.id = id;</span>
+<span class="fc" id="L163">    }</span>
+    public String getName() {
+<span class="fc" id="L165">        return name;</span>
+    }
+<span class="fc" id="L167">    public void setName(String name) { this.name = name; }</span>
+    public Byte getStatus() {
+<span class="fc" id="L169">        return status;</span>
+    }
+    public void setStatus(Byte status) {
+<span class="fc" id="L172">        this.status = status;</span>
+<span class="fc" id="L173">    }</span>
+    public String getConsignee() {
+<span class="fc" id="L175">        return consignee;</span>
+    }
+    public void setConsignee(String consignee) {
+<span class="fc" id="L178">        this.consignee = consignee;</span>
+<span class="fc" id="L179">    }</span>
+    public String getMobile() {
+<span class="fc" id="L181">        return mobile;</span>
+    }
+    public void setMobile(String mobile) {
+<span class="fc" id="L184">        this.mobile = mobile;</span>
+<span class="fc" id="L185">    }</span>
+    public String getAddress() {
+<span class="fc" id="L187">        return address;</span>
+    }
+    public void setAddress(String address) {
+<span class="fc" id="L190">        this.address = address;</span>
+<span class="fc" id="L191">    }</span>
+    public Long getCreatorId() {
+<span class="fc" id="L193">        return creatorId;</span>
+    }
+    public void setCreatorId(Long creatorId) {
+<span class="fc" id="L196">        this.creatorId = creatorId;</span>
+<span class="fc" id="L197">    }</span>
+    public String getCreatorName() {
+<span class="fc" id="L199">        return creatorName;</span>
+    }
+    public void setCreatorName(String creatorName) {
+<span class="fc" id="L202">        this.creatorName = creatorName;</span>
+<span class="fc" id="L203">    }</span>
+    public Long getModifierId() {
+<span class="fc" id="L205">        return modifierId;</span>
+    }
+    public void setModifierId(Long modifierId) {
+<span class="fc" id="L208">        this.modifierId = modifierId;</span>
+<span class="fc" id="L209">    }</span>
+    public String getModifierName() {
+<span class="fc" id="L211">        return modifierName;</span>
+    }
+    public void setModifierName(String modifierName) {
+<span class="fc" id="L214">        this.modifierName = modifierName;</span>
+<span class="fc" id="L215">    }</span>
+    public LocalDateTime getGmtCreate() {
+<span class="fc" id="L217">        return gmtCreate;</span>
+    }
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+<span class="fc" id="L220">        this.gmtCreate = gmtCreate;</span>
+<span class="fc" id="L221">    }</span>
+    public LocalDateTime getGmtModified() {
+<span class="fc" id="L223">        return gmtModified;</span>
+    }
+    public void setGmtModified(LocalDateTime gmtModified) {
+<span class="fc" id="L226">        this.gmtModified = gmtModified;</span>
+<span class="fc" id="L227">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceProviderDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.dao</a> &gt; <span class="el_source">ServiceProviderDao.java</span></div><h1>ServiceProviderDao.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.dao;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.mapper.RedisUtil;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.oomall.service.dao.bo.ServiceProvider;
+import cn.edu.xmu.oomall.service.mapper.ServiceProviderPoMapper;
+import cn.edu.xmu.oomall.service.mapper.po.ServiceProviderPo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.data.domain.*;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Repository
+@RefreshScope
+public class ServiceProviderDao {
+<span class="fc" id="L29">    private static final Logger logger = LoggerFactory.getLogger(ServiceProviderDao.class);</span>
+
+    public static final String KEY = &quot;D%d&quot;;
+
+    @Value(&quot;${oomall.service.timeout}&quot;)
+    private long timeout;
+
+    private RedisUtil redisUtil;
+
+    private ServiceProviderPoMapper serviceProviderPoMapper;
+
+    @Autowired
+<span class="fc" id="L41">    public ServiceProviderDao(ServiceProviderPoMapper serviceProviderPoMapper, RedisUtil redisUtil) {</span>
+<span class="fc" id="L42">        this.serviceProviderPoMapper = serviceProviderPoMapper;</span>
+<span class="fc" id="L43">        this.redisUtil = redisUtil;</span>
+<span class="fc" id="L44">    }</span>
+
+    public ServiceProvider build(ServiceProvider bo) {
+<span class="fc" id="L47">        bo.setServiceProviderDao(ServiceProviderDao.this);</span>
+<span class="fc" id="L48">        return bo;</span>
+    }
+
+    public ServiceProvider build(ServiceProviderPo po, String redisKey) {
+<span class="fc" id="L52">        ServiceProvider bo = CloneFactory.copy(new ServiceProvider(), po);</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if (null != redisKey) {</span>
+<span class="fc" id="L54">            redisUtil.set(redisKey, bo, timeout);</span>
+        }
+<span class="fc" id="L56">        this.build(bo);</span>
+<span class="fc" id="L57">        return bo;</span>
+    }
+
+    /**
+     * 按照id获得对象
+     */
+    public ServiceProvider findById(Long id){
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (id.equals(null)) {</span>
+<span class="nc" id="L65">            throw new IllegalArgumentException(&quot;findById: id is null&quot;);</span>
+        }
+<span class="fc" id="L67">        String key = String.format(KEY, id);</span>
+<span class="fc" id="L68">        ServiceProvider serviceProvider = (ServiceProvider) redisUtil.get(key);</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (!Objects.isNull(serviceProvider)) {</span>
+<span class="nc" id="L70">            serviceProvider = this.build(serviceProvider);</span>
+        } else {
+<span class="fc" id="L72">            Optional&lt;ServiceProviderPo&gt; ret = this.serviceProviderPoMapper.findById(id);</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">            if (ret.isPresent()){</span>
+<span class="fc" id="L74">                serviceProvider = this.build(ret.get(), key);</span>
+            }else{
+<span class="nc" id="L76">                throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;服务商&quot;, id));</span>
+            }
+        }
+<span class="fc" id="L79">        return serviceProvider;</span>
+    }
+
+    /**
+     * 按照创建者找到对象
+     */
+    public List&lt;ServiceProvider&gt; retrieveByCreatorId(Long creatorId, Integer page, Integer pageSize) throws RuntimeException{
+<span class="fc" id="L86">        List&lt;ServiceProvider&gt; ret = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L87">        Pageable pageable = PageRequest.of(page-1, pageSize);</span>
+<span class="fc" id="L88">        List&lt;ServiceProviderPo&gt; pos =  this.serviceProviderPoMapper.findByCreatorId(creatorId, pageable);</span>
+<span class="pc" id="L89">        ret = pos.stream().map(po -&gt; CloneFactory.copy(new ServiceProvider(),po)).collect(Collectors.toList());</span>
+<span class="fc" id="L90">        logger.info(&quot;bos size:{}&quot;, ret.size());</span>
+<span class="fc" id="L91">        return ret;</span>
+    }
+
+    /**
+     * 插入服务商
+     */
+    public ServiceProvider insert(ServiceProvider serviceProvider, UserDto userDto) throws RuntimeException{
+<span class="fc" id="L98">        serviceProvider.setCreator(userDto);</span>
+<span class="fc" id="L99">        serviceProvider.setCreatorId(userDto.getId());</span>
+<span class="fc" id="L100">        serviceProvider.setCreatorName(userDto.getName());</span>
+<span class="fc" id="L101">        serviceProvider.setGmtCreate(LocalDateTime.now());</span>
+<span class="fc" id="L102">        serviceProvider.setStatus(ServiceProvider.NEW);</span>
+<span class="fc" id="L103">        ServiceProviderPo po = CloneFactory.copy(new ServiceProviderPo(), serviceProvider);</span>
+<span class="fc" id="L104">        po.setId(null);</span>
+<span class="fc" id="L105">        po = serviceProviderPoMapper.save(po);</span>
+<span class="fc" id="L106">        serviceProvider.setId(po.getId());</span>
+<span class="fc" id="L107">        logger.debug(&quot;111: serviceProvider.getId = {}&quot;, serviceProvider.getId());</span>
+<span class="fc" id="L108">        logger.debug(&quot;111: serviceProvider.getCreatorId = {}&quot;, serviceProvider.getCreatorId());</span>
+<span class="fc" id="L109">        logger.debug(&quot;111: serviceProvider.getGmtCreate = {}&quot;, serviceProvider.getGmtCreate());</span>
+<span class="fc" id="L110">        return serviceProvider;</span>
+    }
+
+    /**
+     * 服务商修改账户信息
+     */
+    public ServiceProvider save(ServiceProvider serviceProvider, UserDto userDto) throws RuntimeException{
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        if (serviceProvider.getId().equals(null)){</span>
+<span class="nc" id="L118">            throw new IllegalArgumentException(&quot;save: serviceProvider id is null&quot;);</span>
+        }
+<span class="fc" id="L120">        String key = String.format(KEY, serviceProvider.getId());</span>
+<span class="fc" id="L121">        serviceProvider.setModifier(userDto);</span>
+<span class="fc" id="L122">        serviceProvider.setModifierId(userDto.getId());</span>
+<span class="fc" id="L123">        serviceProvider.setModifierName(userDto.getName());</span>
+<span class="fc" id="L124">        serviceProvider.setGmtModified(LocalDateTime.now());</span>
+<span class="fc" id="L125">        ServiceProviderPo po = CloneFactory.copy(new ServiceProviderPo(),serviceProvider);</span>
+<span class="fc" id="L126">        po = serviceProviderPoMapper.save(po);</span>
+<span class="fc" id="L127">        build(po, key);</span>
+<span class="fc" id="L128">        logger.debug(&quot;222: serviceProvider.getId = {}&quot;, serviceProvider.getId());</span>
+<span class="fc" id="L129">        logger.debug(&quot;222: serviceProvider.getCreatorId = {}&quot;, serviceProvider.getCreatorId());</span>
+<span class="fc" id="L130">        logger.debug(&quot;222: serviceProvider.getGmtCreate = {}&quot;, serviceProvider.getGmtCreate());</span>
+<span class="fc" id="L131">        logger.debug(&quot;222: serviceProvider.getModifierId = {}&quot;, serviceProvider.getModifierId());</span>
+<span class="fc" id="L132">        logger.debug(&quot;222: serviceProvider.getGmtModified = {}&quot;, serviceProvider.getGmtModified());</span>
+<span class="fc" id="L133">        return serviceProvider;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

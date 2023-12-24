@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceOrder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.dao.bo</a> &gt; <span class="el_source">ServiceOrder.java</span></div><h1>ServiceOrder.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.dao.bo;
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.bo.OOMallObject;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.oomall.service.controller.vo.ServiceOrderVo;
+import cn.edu.xmu.oomall.service.dao.ServiceOrderDao;
+import cn.edu.xmu.oomall.service.dao.openfeign.FreightExpressDao;
+import cn.edu.xmu.oomall.service.mapper.openfeign.po.FreightExpress;
+import cn.edu.xmu.oomall.service.mapper.po.ServiceOrderPo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+<span class="nc" id="L27">@ToString(callSuper = true, doNotUseGetters = true)</span>
+<span class="fc" id="L28">@NoArgsConstructor</span>
+@CopyFrom({ServiceOrderVo.class, ServiceOrderPo.class})
+public class ServiceOrder extends OOMallObject implements Serializable {
+<span class="fc" id="L31">    private static final Logger logger = LoggerFactory.getLogger(ServiceOrder.class);</span>
+
+    // 上门维修
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L36">    public static final Byte DOORTODOOR = 0;</span>
+
+    // 寄修
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L41">    public static final Byte REPAIR = 1;</span>
+
+    // 未接单
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L46">    public static final Byte UNACCEPTED = 2;</span>
+
+    // 已接单未完成
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L51">    public static final Byte UNFINISHED = 3;</span>
+
+    // 已收件
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L56">    public static final Byte RECEIVED = 4;</span>
+
+    // 已完成
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L61">    public static final Byte FINISHED = 5;</span>
+
+    // 已取消
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L66">    public static final Byte CANCELED = 6;</span>
+
+    /**
+     * 状态和名称的对应
+     */
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L73">    public static final Map&lt;Byte, String&gt; STATUSNAMES = new HashMap() {</span>
+        {
+<span class="fc" id="L75">            put(UNACCEPTED, &quot;未接单&quot;);</span>
+<span class="fc" id="L76">            put(UNFINISHED, &quot;已接单未完成&quot;);</span>
+<span class="fc" id="L77">            put(RECEIVED, &quot;已收件&quot;);</span>
+<span class="fc" id="L78">            put(FINISHED, &quot;已完成&quot;);</span>
+<span class="fc" id="L79">        }</span>
+    };
+
+    /**
+     * 允许的状态迁移
+     */
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L87">    private static final Map&lt;Byte, Set&lt;Byte&gt;&gt; toStatus = new HashMap&lt;&gt;() {</span>
+        {
+<span class="fc" id="L89">            put(UNACCEPTED, new HashSet&lt;&gt;() {</span>
+                {
+<span class="fc" id="L91">                    add(UNFINISHED);</span>
+<span class="fc" id="L92">                    add(CANCELED);</span>
+<span class="fc" id="L93">                }</span>
+            });
+<span class="fc" id="L95">            put(UNFINISHED, new HashSet&lt;&gt;() {</span>
+                {
+<span class="fc" id="L97">                    add(RECEIVED);</span>
+<span class="fc" id="L98">                    add(FINISHED);</span>
+<span class="fc" id="L99">                    add(CANCELED);</span>
+<span class="fc" id="L100">                }</span>
+            });
+<span class="fc" id="L102">            put(RECEIVED, new HashSet&lt;&gt;() {</span>
+                {
+<span class="fc" id="L104">                    add(FINISHED);</span>
+<span class="fc" id="L105">                    add(CANCELED);</span>
+<span class="fc" id="L106">                }</span>
+            });
+<span class="fc" id="L108">        }</span>
+    };
+
+    /**
+     * 是否允许状态迁移
+     * @param status
+     * @return
+     */
+    public boolean allowStatus(Byte status) {
+<span class="fc" id="L117">        boolean ret = false;</span>
+
+<span class="pc bpc" id="L119" title="2 of 4 branches missed.">        if (null != status &amp;&amp; null != this.status) {</span>
+<span class="fc" id="L120">            Set&lt;Byte&gt; allowStatusSet = toStatus.get(this.status);</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">            if (null != allowStatusSet) {</span>
+<span class="fc" id="L122">                ret = allowStatusSet.contains(status);</span>
+            }
+        }
+<span class="fc" id="L125">        return ret;</span>
+    }
+
+    /**
+     * 获得当前状态名称
+     */
+    @JsonIgnore
+    public String getStatusName() {
+<span class="nc" id="L133">        return STATUSNAMES.get(this.status);</span>
+    }
+
+    /**
+     * 修改服务单状态
+     */
+    private void changeStatus(ServiceOrder serviceOrder,Byte status, UserDto user) {
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">        if (!this.allowStatus(status)) {</span>
+<span class="nc" id="L141">            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务单&quot;, this.id, STATUSNAMES.get(this.status)));</span>
+        }
+<span class="fc" id="L143">        serviceOrder.setStatus(status);</span>
+<span class="fc" id="L144">        serviceOrder.setId(this.id);</span>
+<span class="fc" id="L145">        this.serviceOrderDao.save(serviceOrder, user);</span>
+<span class="fc" id="L146">        logger.debug(&quot;222status = {}&quot;, serviceOrder.getStatus());</span>
+<span class="fc" id="L147">        this.serviceOrderDao.save(this, user);</span>
+<span class="fc" id="L148">    }</span>
+
+
+    // 接受服务单
+    public void accept(UserDto user) {
+<span class="pc bpc" id="L153" title="1 of 2 branches missed.">        if (!this.status.equals(ServiceOrder.UNACCEPTED)) {</span>
+<span class="nc" id="L154">            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务单&quot;, id, user));</span>
+        }
+<span class="fc" id="L156">        this.changeStatus(this, ServiceOrder.UNFINISHED, user);</span>
+<span class="fc" id="L157">        this.serviceOrderDao.save(this, user);</span>
+<span class="fc" id="L158">    }</span>
+
+    /*
+    // 确认收件
+    public void receive(UserDto user) {
+        if (!this.status.equals(ServiceOrder.UNFINISHED)) {
+            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务单&quot;, id, user));
+        }
+        this.changeStatus(this,ServiceOrder.RECEIVED, user);
+        this.serviceOrderDao.save(this, user);
+    }
+    */
+
+    /*
+    // 完成服务单
+    public void finish(UserDto user) {
+        if (this.status.equals(ServiceOrder.FINISHED)) {
+            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务单&quot;, id, user));
+        }
+        this.changeStatus(this,ServiceOrder.FINISHED, user);
+        this.serviceOrderDao.save(this, user);
+    }
+     */
+
+    /**
+     * 取消服务单
+     */
+    public ServiceOrder cancel(ServiceOrder serviceOrder, UserDto user) {
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        if (this.status.equals(ServiceOrder.FINISHED)) {</span>
+<span class="nc" id="L187">            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务单&quot;, id, user));</span>
+        }
+<span class="fc" id="L189">        this.changeStatus(this,ServiceOrder.CANCELED, user);</span>
+<span class="fc" id="L190">        this.serviceOrderDao.save(this, user);</span>
+<span class="fc" id="L191">        ServiceOrder newServiceOrder = serviceOrder;</span>
+<span class="fc" id="L192">        return newServiceOrder;</span>
+    }
+
+
+    private Long id;
+    public Long getId() {
+<span class="fc" id="L198">        return id;</span>
+    }
+    public void setId(Long id) {
+<span class="fc" id="L201">        this.id = id;</span>
+<span class="fc" id="L202">    }</span>
+
+    // 种类
+    private Byte type;
+    // 联系人地址
+    private String address;
+    // 联系人姓名
+    private String consignee;
+    // 联系人电话
+    private String mobile;
+    // 维修人姓名
+    private String maintainerName;
+    // 维修人电话
+    private String maintainerMobile;
+    // 状态
+    private Byte status;
+    // 描述
+    private String description;
+    // 服务单创建时间
+    private LocalDateTime gmtCreate;
+    // 服务单接受时间
+    private LocalDateTime gmtModified;
+    // 收件时间
+    private LocalDateTime gmtReceived;
+    // 服务结束时间
+    private LocalDateTime gmtEnd;
+    // 服务结果
+    private String result;
+    // 服务商id
+    private Long serviceProviderId;
+    // 运单号
+    private Long freightExpressId;
+    // 产品串号
+    private Long serialNo;
+    // 产品id
+    private Long productId;
+    // 地区id
+    private Long regionId;
+    // 商铺id
+    private Long shopId;
+
+    @ToString.Exclude
+    @JsonIgnore
+    private ServiceOrder serviceOrder;
+
+<span class="fc" id="L247">    @Setter</span>
+    @JsonIgnore
+    @ToString.Exclude
+    private ServiceOrderDao serviceOrderDao;
+
+    public Byte getType() {
+<span class="fc" id="L253">        return type;</span>
+    }
+    public void setType(Byte type) {
+<span class="fc" id="L256">        this.type = type;</span>
+<span class="fc" id="L257">    }</span>
+    public String getAddress() {
+<span class="fc" id="L259">        return address;</span>
+    }
+    public void setAddress(String address) {
+<span class="fc" id="L262">        this.address = address;</span>
+<span class="fc" id="L263">    }</span>
+    public String getConsignee() {
+<span class="fc" id="L265">        return consignee;</span>
+    }
+    public void setConsignee(String consignee) {
+<span class="fc" id="L268">        this.consignee = consignee;</span>
+<span class="fc" id="L269">    }</span>
+    public String getMobile() {
+<span class="fc" id="L271">        return mobile;</span>
+    }
+    public void setMobile(String mobile) {
+<span class="fc" id="L274">        this.mobile = mobile;</span>
+<span class="fc" id="L275">    }</span>
+    public String getMaintainerName() {
+<span class="fc" id="L277">        return maintainerName;</span>
+    }
+    public void setMaintainerName(String maintainerName) {
+<span class="fc" id="L280">        this.maintainerName = maintainerName;</span>
+<span class="fc" id="L281">    }</span>
+    public String getMaintainerMobile() {
+<span class="fc" id="L283">        return maintainerMobile;</span>
+    }
+    public void setMaintainerMobile(String maintainerMobile) {
+<span class="fc" id="L286">        this.maintainerMobile = maintainerMobile;</span>
+<span class="fc" id="L287">    }</span>
+    public Byte getStatus() {
+<span class="fc" id="L289">        return status;</span>
+    }
+    public void setStatus(Byte status) {
+<span class="fc" id="L292">        this.status = status;</span>
+<span class="fc" id="L293">    }</span>
+    public String getDescription() {
+<span class="fc" id="L295">        return description;</span>
+    }
+<span class="fc" id="L297">    public void setDescription(String description) { this.description = description; }</span>
+    public LocalDateTime getGmtCreate() {
+<span class="fc" id="L299">        return gmtCreate;</span>
+    }
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+<span class="fc" id="L302">        this.gmtCreate = gmtCreate;</span>
+<span class="fc" id="L303">    }</span>
+    public LocalDateTime getGmtModified() {
+<span class="fc" id="L305">        return gmtModified;</span>
+    }
+    public void setGmtModified(LocalDateTime gmtModified) {
+<span class="fc" id="L308">        this.gmtModified = gmtModified;</span>
+<span class="fc" id="L309">    }</span>
+    public LocalDateTime getGmtReceived() {
+<span class="fc" id="L311">        return gmtReceived;</span>
+    }
+    public void setGmtReceived(LocalDateTime gmtReceived) {
+<span class="fc" id="L314">        this.gmtReceived = gmtReceived;</span>
+<span class="fc" id="L315">    }</span>
+    public LocalDateTime getGmtEnd() {
+<span class="fc" id="L317">        return gmtEnd;</span>
+    }
+    public void setGmtEnd(LocalDateTime gmtEnd) {
+<span class="fc" id="L320">        this.gmtEnd = gmtEnd;</span>
+<span class="fc" id="L321">    }</span>
+    public String getResult() {
+<span class="fc" id="L323">        return result;</span>
+    }
+    public void setResult(String result) {
+<span class="fc" id="L326">        this.result = result;</span>
+<span class="fc" id="L327">    }</span>
+<span class="fc" id="L328">    public Long getServiceProviderId(){ return serviceProviderId; }</span>
+<span class="fc" id="L329">    public void setServiceProviderId(Long serviceProviderId){ this.serviceProviderId = serviceProviderId; }</span>
+<span class="fc" id="L330">    public Long getFreightExpressId(){ return freightExpressId; }</span>
+<span class="fc" id="L331">    public void setFreightExpressId(Long freightExpressId){ this.freightExpressId = freightExpressId; }</span>
+    public Long getCreatorId() {
+<span class="fc" id="L333">        return creatorId;</span>
+    }
+    public void setCreatorId(Long creatorId) {
+<span class="fc" id="L336">        this.creatorId = creatorId;</span>
+<span class="fc" id="L337">    }</span>
+    public String getCreatorName() {
+<span class="fc" id="L339">        return creatorName;</span>
+    }
+    public void setCreatorName(String creatorName) {
+<span class="fc" id="L342">        this.creatorName = creatorName;</span>
+<span class="fc" id="L343">    }</span>
+    public Long getModifierId() {
+<span class="fc" id="L345">        return modifierId;</span>
+    }
+    public void setModifierId(Long modifierId) {
+<span class="fc" id="L348">        this.modifierId = modifierId;</span>
+<span class="fc" id="L349">    }</span>
+    public String getModifierName() {
+<span class="fc" id="L351">        return modifierName;</span>
+    }
+    public void setModifierName(String modifierName) {
+<span class="fc" id="L354">        this.modifierName = modifierName;</span>
+<span class="fc" id="L355">    }</span>
+<span class="fc" id="L356">    public Long getSerialNo(){ return serialNo; }</span>
+<span class="fc" id="L357">    public void setSerialNo(Long serialNo){ this.serialNo = serialNo; }</span>
+<span class="fc" id="L358">    public Long getProductId(){ return productId; }</span>
+<span class="fc" id="L359">    public void setProductId(Long productId){ this.productId = productId; }</span>
+<span class="fc" id="L360">    public Long getRegionId(){ return regionId; }</span>
+<span class="fc" id="L361">    public void setRegionId(Long regionId){ this.regionId = regionId; }</span>
+<span class="fc" id="L362">    public Long getShopId(){ return shopId; }</span>
+<span class="fc" id="L363">    public void setShopId(Long shopId){ this.shopId = shopId; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

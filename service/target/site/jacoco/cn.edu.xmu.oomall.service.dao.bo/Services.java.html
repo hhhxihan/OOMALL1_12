@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Services.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.dao.bo</a> &gt; <span class="el_source">Services.java</span></div><h1>Services.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.dao.bo;
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.javaee.core.model.bo.OOMallObject;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import cn.edu.xmu.oomall.service.dao.ServiceDao;
+import cn.edu.xmu.oomall.service.mapper.po.ServicePo;
+import cn.edu.xmu.oomall.service.dao.ProductServiceDao;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.*;
+
+<span class="fc" id="L18">@NoArgsConstructor</span>
+<span class="nc" id="L19">@AllArgsConstructor</span>
+<span class="nc" id="L20">@ToString(callSuper = true, doNotUseGetters = true)</span>
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@CopyFrom({ServicePo.class})
+public class Services extends OOMallObject implements Serializable {
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L26">    private final static Logger logger = LoggerFactory.getLogger(Services.class);</span>
+    // 申请
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L30">    public static final Byte VALID = 0;</span>
+    // 停用
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L34">    public static final Byte ABANDON = 1;</span>
+
+    /**
+     * 状态和名称的对应
+     */
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L41">    public static final Map&lt;Byte, String&gt; STATUSNAMES = new HashMap() {</span>
+        {
+<span class="fc" id="L43">            put(VALID, &quot;有效&quot;);</span>
+<span class="fc" id="L44">            put(ABANDON, &quot;停用&quot;);</span>
+<span class="fc" id="L45">        }</span>
+    };
+
+    /**
+     * 允许的状态迁移
+     */
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L53">    private static final Map&lt;Byte, Set&lt;Byte&gt;&gt; toStatus = new HashMap&lt;&gt;() {</span>
+        {
+<span class="fc" id="L55">            put(VALID, new HashSet&lt;&gt;() {</span>
+                {
+<span class="fc" id="L57">                    add(ABANDON);</span>
+<span class="fc" id="L58">                }</span>
+            });
+<span class="fc" id="L60">        }</span>
+    };
+
+    /**
+     * 是否允许状态迁移
+     */
+    /*
+    public boolean allowStatus(Byte status) {
+        boolean ret = false;
+
+        if (null != status &amp;&amp; null != this.status) {
+            Set&lt;Byte&gt; allowStatusSet = toStatus.get(this.status);
+            if (null != allowStatusSet) {
+                ret = allowStatusSet.contains(status);
+            }
+        }
+        return ret;
+    }
+    */
+
+    /**
+     * 废弃服务
+     */
+    /*
+    public void abandon(UserDto user){
+        this.changeStatus(Services.ABANDON, user);
+    }
+    */
+
+    /**
+     *更改服务状态
+     */
+    /*
+    private void changeStatus(Byte status, UserDto user){
+        logger.debug(&quot;changeStatus: id = {}, status = {}&quot;, this.id, status);
+
+        if (!this.allowStatus(status)) {
+            // 状态不允许变动
+            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务&quot;, this.id, STATUSNAMES.get(this.status)));
+        }
+        Services service = new Services();
+        service.setStatus(status);
+        service.setId(this.id);
+        this.serviceDao.save(service, user);
+    }
+    */
+
+    /**
+     * 创建服务
+     */
+    /*
+    public Services createService(Services service, UserDto user){
+        if (VALID == this.status) {
+            service.setStatus(this.status);
+            return this.serviceDao.insert(service, user);
+        }else{
+            throw new BusinessException(ReturnNo.REGION_ABANDONE, String.format(ReturnNo.REGION_ABANDONE.getMessage(), this.id));
+        }
+    }
+    */
+
+    /**
+     * 获得当前状态名称
+     */
+    @JsonIgnore
+    public String getStatusName() {
+<span class="nc" id="L126">        return STATUSNAMES.get(this.status);</span>
+    }
+
+    private Long id;
+
+    // 服务名称
+    private String name;
+
+    // 服务状态
+    private Byte status;
+
+    // 服务类型
+    private Byte type;
+
+    // 描述
+    private String description;
+
+    // 服务商
+    private Long serviceProviderId;
+
+    @ToString.Exclude
+    @JsonIgnore
+    private Services service;
+
+<span class="fc" id="L150">    @Setter</span>
+    @JsonIgnore
+    @ToString.Exclude
+    public ServiceDao serviceDao;
+
+<span class="fc" id="L155">    @Setter</span>
+    @JsonIgnore
+    @ToString.Exclude
+    public ProductServiceDao productServiceDao;
+
+
+    /**
+     * 创建者id
+     */
+    private Long creatorId;
+
+    /**
+     * 创建者
+     */
+    private String creatorName;
+
+    /**
+     * 修改者id
+     */
+    private Long modifierId;
+
+    /**
+     * 修改者
+     */
+    private String modifierName;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime gmtCreate;
+
+    /**
+     * 修改时间
+     */
+    private LocalDateTime gmtModified;
+
+
+    public void cancelProductServiceByShop(Long shopId){
+<span class="pc bpc" id="L193" title="1 of 2 branches missed.">        if (this.productServiceDao == null){</span>
+<span class="nc" id="L194">            throw new IllegalArgumentException(&quot;Service.cancel: productServiceDao is null&quot;);</span>
+        }
+        //if(this.productServiceDao!=null) {
+<span class="fc" id="L197">            List&lt;ProductService&gt; productServiceList = this.productServiceDao.findByServiceIdAndShopId(this.id, shopId, 1, 10);</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">            for (ProductService obj : productServiceList) {</span>
+<span class="fc" id="L199">                obj.setServiceDao(this.serviceDao);</span>
+<span class="fc" id="L200">                obj.setProductServiceDao(this.productServiceDao);</span>
+<span class="fc" id="L201">                obj.cancel();</span>
+<span class="fc" id="L202">            }</span>
+        //}
+<span class="fc" id="L204">    }</span>
+
+    public String getName() {
+<span class="fc" id="L207">        return name;</span>
+    }
+<span class="fc" id="L209">    public void setName(String name) { this.name = name; }</span>
+    public Byte getStatus() {
+<span class="fc" id="L211">        return status;</span>
+    }
+    public void setStatus(Byte status) {
+<span class="fc" id="L214">        this.status = status;</span>
+<span class="fc" id="L215">    }</span>
+    public Byte getType() {
+<span class="fc" id="L217">        return type;</span>
+    }
+    public void setType(Byte type) {
+<span class="fc" id="L220">        this.type = type;</span>
+<span class="fc" id="L221">    }</span>
+    public String getDescription() {
+<span class="fc" id="L223">        return description;</span>
+    }
+    public void setDescription(String description) {
+<span class="fc" id="L226">        this.description = description;</span>
+<span class="fc" id="L227">    }</span>
+<span class="fc" id="L228">    public Long getServiceProviderId() { return serviceProviderId;}</span>
+    public void setServiceProviderId(Long serviceProviderId) {
+<span class="fc" id="L230">        this.serviceProviderId = serviceProviderId;</span>
+<span class="fc" id="L231">    }</span>
+
+
+    public Long getId() {
+<span class="fc" id="L235">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L239">        this.id = id;</span>
+<span class="fc" id="L240">    }</span>
+
+    public Long getCreatorId() {
+<span class="fc" id="L243">        return creatorId;</span>
+    }
+
+    public void setCreatorId(Long creatorId) {
+<span class="fc" id="L247">        this.creatorId = creatorId;</span>
+<span class="fc" id="L248">    }</span>
+
+    public String getCreatorName() {
+<span class="fc" id="L251">        return creatorName;</span>
+    }
+
+    public void setCreatorName(String creatorName) {
+<span class="fc" id="L255">        this.creatorName = creatorName;</span>
+<span class="fc" id="L256">    }</span>
+
+    public Long getModifierId() {
+<span class="fc" id="L259">        return modifierId;</span>
+    }
+
+    public void setModifierId(Long modifierId) {
+<span class="fc" id="L263">        this.modifierId = modifierId;</span>
+<span class="fc" id="L264">    }</span>
+
+    public String getModifierName() {
+<span class="fc" id="L267">        return modifierName;</span>
+    }
+
+    public void setModifierName(String modifierName) {
+<span class="fc" id="L271">        this.modifierName = modifierName;</span>
+<span class="fc" id="L272">    }</span>
+
+    public LocalDateTime getGmtCreate() {
+<span class="fc" id="L275">        return gmtCreate;</span>
+    }
+
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+<span class="fc" id="L279">        this.gmtCreate = gmtCreate;</span>
+<span class="fc" id="L280">    }</span>
+
+    public LocalDateTime getGmtModified() {
+<span class="fc" id="L283">        return gmtModified;</span>
+    }
+
+    public void setGmtModified(LocalDateTime gmtModified) {
+<span class="fc" id="L287">        this.gmtModified = gmtModified;</span>
+<span class="fc" id="L288">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

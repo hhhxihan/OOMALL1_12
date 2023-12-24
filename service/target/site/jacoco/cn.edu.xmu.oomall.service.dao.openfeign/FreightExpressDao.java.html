@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FreightExpressDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.dao.openfeign</a> &gt; <span class="el_source">FreightExpressDao.java</span></div><h1>FreightExpressDao.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.dao.openfeign;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.InternalReturnObject;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.oomall.service.dao.bo.ServiceOrder;
+import cn.edu.xmu.oomall.service.mapper.openfeign.FreightExpressMapper;
+import cn.edu.xmu.oomall.service.mapper.openfeign.po.FreightExpress;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class FreightExpressDao {
+<span class="fc" id="L16">    private Logger logger = LoggerFactory.getLogger(FreightExpressDao.class);</span>
+
+    private FreightExpressMapper freightExpressMapper;
+    private FreightExpress freightExpress;
+    @Autowired
+<span class="fc" id="L21">    public FreightExpressDao(FreightExpressMapper freightExpressMapper) {</span>
+<span class="fc" id="L22">        this.freightExpressMapper = freightExpressMapper;</span>
+<span class="fc" id="L23">    }</span>
+
+    public FreightExpress findById(Long id){
+<span class="nc" id="L26">        InternalReturnObject&lt;FreightExpress&gt; ret = this.freightExpressMapper.getFreightExpressById(id);</span>
+<span class="nc bnc" id="L27" title="All 2 branches missed.">        if (ret.getErrno().equals(ReturnNo.OK)){</span>
+<span class="nc" id="L28">            return ret.getData();</span>
+        }else{
+<span class="nc" id="L30">            throw new BusinessException(ReturnNo.getReturnNoByCode(ret.getErrno()), ret.getErrmsg());</span>
+        }
+    }
+
+    /**
+     * 核对运单信息
+     */
+    public void checkProduct(ServiceOrder serviceOrder, FreightExpress freightExpress){
+<span class="nc" id="L38">        Long serviceProviderId = serviceOrder.getServiceProviderId();</span>
+<span class="nc" id="L39">        InternalReturnObject&lt;FreightExpress&gt; express = freightExpressMapper.getFreightExpressById(serviceProviderId);</span>
+<span class="nc" id="L40">        FreightExpress expressInfo = express.getData();</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if(expressInfo != freightExpress){</span>
+<span class="nc" id="L42">            throw new BusinessException(ReturnNo.INCONSISTENT_DATA, String.format(ReturnNo.INCONSISTENT_DATA.getMessage(),freightExpress.getId()));</span>
+        }
+<span class="nc" id="L44">    }</span>
+
+    /**
+     * 创建运单
+     */
+    public void createFreightExpress(ServiceOrder serviceOrder){
+<span class="nc" id="L50">        Long serviceProviderId = serviceOrder.getServiceProviderId();</span>
+<span class="nc" id="L51">        InternalReturnObject&lt;FreightExpress&gt; freightExpress = this.freightExpressMapper.createFreightExpressById(serviceProviderId, serviceOrder.getSerialNo());</span>
+<span class="nc" id="L52">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

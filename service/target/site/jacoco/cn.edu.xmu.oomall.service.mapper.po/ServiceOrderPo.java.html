@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceOrderPo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.mapper.po</a> &gt; <span class="el_source">ServiceOrderPo.java</span></div><h1>ServiceOrderPo.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.mapper.po;
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.oomall.service.dao.bo.ServiceOrder;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = &quot;service_service_order&quot;)
+<span class="nc" id="L13">@AllArgsConstructor</span>
+<span class="fc" id="L14">@NoArgsConstructor</span>
+@CopyFrom({ServiceOrder.class})
+public class ServiceOrderPo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)//为一个实体生成一个唯一标识的主键，主键自增长
+    private Long id;
+
+    // 种类
+    private Byte type;
+
+    // 服务地址
+    private String address;
+
+    // 联系人姓名
+    private String consignee;
+
+    // 联系人电话
+    private String mobile;
+
+    // 维修人姓名
+    private String maintainerName;
+
+    // 维修人电话
+    private String maintainerMobile;
+
+    // 状态
+    private Byte status;
+
+    // 结果
+    private String result;
+
+    // 描述
+    private String description;
+
+    // 创建者id
+    private Long creatorId;
+
+    // 创建者姓名
+    private String creatorName;
+
+    // 修改者id
+    private Long modifierId;
+
+    // 修改者姓名
+    private String modifierName;
+
+    // 服务单创建时间
+    private LocalDateTime gmtCreate;
+
+    // 服务单接受时间
+    private LocalDateTime gmtModified;
+
+    // 收件时间
+    private LocalDateTime gmtReceived;
+
+    // 服务结束时间
+    private LocalDateTime gmtEnd;
+
+    // 服务商id
+    private Long serviceProviderId;
+
+    // 产品串号
+    private Long serialNo;
+
+    // 运单号
+    private Long freightExpressId;
+
+    // 产品id
+    private Long productId;
+
+    // 地区id
+    private Long regionId;
+
+    // 商铺id
+    private Long shopId;
+
+    public Long getId() {
+<span class="fc" id="L91">        return id;</span>
+    }
+    public void setId(Long id) {
+<span class="fc" id="L94">        this.id = id;</span>
+<span class="fc" id="L95">    }</span>
+    public Byte getType() {
+<span class="fc" id="L97">        return type;</span>
+    }
+    public void setType(Byte type) {
+<span class="fc" id="L100">        this.type = type;</span>
+<span class="fc" id="L101">    }</span>
+    public String getAddress() {
+<span class="fc" id="L103">        return address;</span>
+    }
+    public void setAddress(String address) {
+<span class="fc" id="L106">        this.address = address;</span>
+<span class="fc" id="L107">    }</span>
+    public String getConsignee() {
+<span class="fc" id="L109">        return consignee;</span>
+    }
+    public void setConsignee(String consignee) {
+<span class="fc" id="L112">        this.consignee = consignee;</span>
+<span class="fc" id="L113">    }</span>
+    public String getMobile() {
+<span class="fc" id="L115">        return mobile;</span>
+    }
+    public void setMobile(String mobile) {
+<span class="fc" id="L118">        this.mobile = mobile;</span>
+<span class="fc" id="L119">    }</span>
+    public String getMaintainerName() {
+<span class="fc" id="L121">        return maintainerName;</span>
+    }
+    public void setMaintainerName(String maintainerName) {
+<span class="fc" id="L124">        this.maintainerName = maintainerName;</span>
+<span class="fc" id="L125">    }</span>
+    public String getMaintainerMobile() {
+<span class="fc" id="L127">        return maintainerMobile;</span>
+    }
+    public void setMaintainerMobile(String maintainerMobile) {
+<span class="fc" id="L130">        this.maintainerMobile = maintainerMobile;</span>
+<span class="fc" id="L131">    }</span>
+    public Byte getStatus() {
+<span class="fc" id="L133">        return status;</span>
+    }
+    public void setStatus(Byte status) {
+<span class="fc" id="L136">        this.status = status;</span>
+<span class="fc" id="L137">    }</span>
+    public String getDescription() {
+<span class="fc" id="L139">        return description;</span>
+    }
+    public void setDescription(String description) {
+<span class="fc" id="L142">        this.description = description;</span>
+<span class="fc" id="L143">    }</span>
+    public LocalDateTime getGmtCreate() {
+<span class="fc" id="L145">        return gmtCreate;</span>
+    }
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+<span class="fc" id="L148">        this.gmtCreate = gmtCreate;</span>
+<span class="fc" id="L149">    }</span>
+    public LocalDateTime getGmtModified() {
+<span class="fc" id="L151">        return gmtModified;</span>
+    }
+    public void setGmtModified(LocalDateTime gmtModified) {
+<span class="fc" id="L154">        this.gmtModified = gmtModified;</span>
+<span class="fc" id="L155">    }</span>
+    public LocalDateTime getGmtReceived() {
+<span class="fc" id="L157">        return gmtReceived;</span>
+    }
+    public void setGmtReceived(LocalDateTime gmtReceived) {
+<span class="fc" id="L160">        this.gmtReceived = gmtReceived;</span>
+<span class="fc" id="L161">    }</span>
+    public LocalDateTime getGmtEnd() {
+<span class="fc" id="L163">        return gmtEnd;</span>
+    }
+    public void setGmtEnd(LocalDateTime gmtEnd) {
+<span class="fc" id="L166">        this.gmtEnd = gmtEnd;</span>
+<span class="fc" id="L167">    }</span>
+    public String getResult() {
+<span class="fc" id="L169">        return result;</span>
+    }
+    public void setResult(String result) {
+<span class="fc" id="L172">        this.result = result;</span>
+<span class="fc" id="L173">    }</span>
+<span class="fc" id="L174">    public Long getServiceProviderId(){ return serviceProviderId; }</span>
+<span class="fc" id="L175">    public void setServiceProviderId(Long serviceProviderId){ this.serviceProviderId = serviceProviderId; }</span>
+<span class="fc" id="L176">    public Long getFreightExpressId(){ return freightExpressId; }</span>
+<span class="fc" id="L177">    public void setFreightExpressId(Long freightExpressId){ this.freightExpressId = freightExpressId; }</span>
+<span class="fc" id="L178">    public Long getSerialNo(){ return serialNo; }</span>
+<span class="fc" id="L179">    public void setSerialNo(Long serialNo){ this.serialNo = serialNo; }</span>
+<span class="fc" id="L180">    public Long getProductId(){ return productId; }</span>
+<span class="fc" id="L181">    public void setProductId(Long productId){ this.productId = productId; }</span>
+<span class="fc" id="L182">    public Long getRegionId(){ return regionId; }</span>
+<span class="fc" id="L183">    public void setRegionId(Long regionId){ this.regionId = regionId; }</span>
+<span class="fc" id="L184">    public Long getShopId(){ return shopId; }</span>
+<span class="fc" id="L185">    public void setShopId(Long shopId){ this.shopId = shopId; }</span>
+    public Long getCreatorId() {
+<span class="fc" id="L187">        return creatorId;</span>
+    }
+    public void setCreatorId(Long creatorId) {
+<span class="fc" id="L190">        this.creatorId = creatorId;</span>
+<span class="fc" id="L191">    }</span>
+    public String getCreatorName() {
+<span class="fc" id="L193">        return creatorName;</span>
+    }
+    public void setCreatorName(String creatorName) {
+<span class="fc" id="L196">        this.creatorName = creatorName;</span>
+<span class="fc" id="L197">    }</span>
+    public Long getModifierId() {
+<span class="fc" id="L199">        return modifierId;</span>
+    }
+    public void setModifierId(Long modifierId) {
+<span class="fc" id="L202">        this.modifierId = modifierId;</span>
+<span class="fc" id="L203">    }</span>
+    public String getModifierName() {
+<span class="fc" id="L205">        return modifierName;</span>
+    }
+    public void setModifierName(String modifierName) {
+<span class="fc" id="L208">        this.modifierName = modifierName;</span>
+<span class="fc" id="L209">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

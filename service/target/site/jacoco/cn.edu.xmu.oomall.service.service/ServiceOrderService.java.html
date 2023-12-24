@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceOrderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.service</a> &gt; <span class="el_source">ServiceOrderService.java</span></div><h1>ServiceOrderService.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.service;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.oomall.service.dao.ProductServiceDao;
+import cn.edu.xmu.oomall.service.dao.ServiceDao;
+import cn.edu.xmu.oomall.service.dao.ServiceOrderDao;
+import cn.edu.xmu.oomall.service.dao.bo.ProductService;
+import cn.edu.xmu.oomall.service.dao.bo.ServiceOrder;
+import cn.edu.xmu.oomall.service.dao.bo.Services;
+import cn.edu.xmu.oomall.service.dao.openfeign.FreightExpressDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Transactional(propagation = Propagation.REQUIRED)
+public class ServiceOrderService {
+<span class="fc" id="L26">    private final Logger logger = LoggerFactory.getLogger(ServiceOrderService.class);</span>
+
+    private ServiceOrderDao serviceOrderDao;
+    @Autowired
+    private ServiceDao serviceDao;
+    @Autowired
+    private ProductServiceDao productServiceDao;
+    @Autowired
+    private FreightExpressDao freightExpressDao;
+
+    @Autowired
+<span class="fc" id="L37">    public ServiceOrderService(ServiceOrderDao serviceOrderDao){</span>
+<span class="fc" id="L38">        this.serviceOrderDao = serviceOrderDao;</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * 服务商查询符合条件的服务单
+     */
+    public List&lt;ServiceOrder&gt; findAllServiceOrders(Long serviceProviderId, Integer page, Integer pageSize) {
+<span class="fc" id="L45">        List&lt;ServiceOrder&gt; serviceOrders = new ArrayList&lt;&gt;();</span>
+        // 查询符合条件的服务
+<span class="fc" id="L47">        List&lt;Services&gt; services = this.serviceDao.findByServiceProviderId(serviceProviderId, page, pageSize);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        for (Services service : services) {</span>
+<span class="fc" id="L49">            logger.debug(&quot;111djyyyID: {}&quot;, service.getId());</span>
+<span class="fc" id="L50">        }</span>
+        // 遍历每个服务，查询对应的产品服务
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        for (Services service : services) {</span>
+<span class="fc" id="L53">            Long serviceId = service.getId();</span>
+<span class="fc" id="L54">            List&lt;ProductService&gt; productServices = this.productServiceDao.findByServiceIdAndStatus(serviceId, page, pageSize);</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">            for (ProductService productService : productServices) {</span>
+<span class="fc" id="L56">                logger.debug(&quot;222djyyyID: {}&quot;, productService.getId());</span>
+<span class="fc" id="L57">            }</span>
+            // 遍历每个产品服务，查询对应的服务单
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            for (ProductService productService : productServices) {</span>
+<span class="fc" id="L60">                Long productId = productService.getProductId();</span>
+<span class="fc" id="L61">                Long regionId = productService.getRegionId();</span>
+<span class="fc" id="L62">                Long shopId = productService.getShopId();</span>
+<span class="fc" id="L63">                List&lt;ServiceOrder&gt; orders = this.serviceOrderDao.findByProductIdAndRegionIdAndShopIdAndStatus(productId, regionId, shopId, page, pageSize);</span>
+<span class="fc bfc" id="L64" title="All 2 branches covered.">                for (ServiceOrder order : orders) {</span>
+<span class="fc" id="L65">                    logger.debug(&quot;333djyyyID: {}&quot;, order.getId());</span>
+<span class="fc" id="L66">                }</span>
+<span class="fc" id="L67">                serviceOrders.addAll(orders);</span>
+<span class="fc" id="L68">            }</span>
+<span class="fc" id="L69">        }</span>
+<span class="fc" id="L70">        return serviceOrders;</span>
+    }
+
+    /**
+     * 服务商查看服务单信息
+     */
+    public ServiceOrder findServiceOrderById(Long serviceProviderId, Long id){
+<span class="fc" id="L77">        ServiceOrder ret = this.serviceOrderDao.findById(id);</span>
+<span class="pc bpc" id="L78" title="2 of 4 branches missed.">        if(ret.getServiceProviderId() == null || !ret.getServiceProviderId().equals(serviceProviderId)){</span>
+<span class="nc" id="L79">            throw new BusinessException(ReturnNo.AUTH_NO_RIGHT, String.format(ReturnNo.AUTH_NO_RIGHT.getMessage()));</span>
+        }
+<span class="fc" id="L81">        return ret;</span>
+    }
+
+    /**
+     * 服务商接受服务单
+     */
+    public void acceptServiceOrder(Long serviceProviderId, Long id, ServiceOrder newServiceOrder, UserDto user){
+<span class="fc" id="L88">        ServiceOrder serviceOrder = this.serviceOrderDao.findById(id);</span>
+<span class="fc" id="L89">        List&lt;ProductService&gt; productServices = this.productServiceDao.findByProductIdAndRegionIdAndShopIdAndStatus(serviceOrder.getProductId(), serviceOrder.getRegionId(), serviceOrder.getShopId(), 1, 10);</span>
+<span class="fc" id="L90">        List&lt;Services&gt; services = this.serviceDao.findByServiceProviderId(serviceProviderId, 1, 10);</span>
+
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        for (ProductService productService : productServices) {</span>
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">            for (Services service : services) {</span>
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">                if(service.getId() == productService.getServiceId()){</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">                   if(!serviceOrder.getStatus().equals(ServiceOrder.UNACCEPTED)){</span>
+<span class="nc" id="L96">                            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务单&quot;, serviceOrder.getId(), serviceOrder.getStatusName()));</span>
+                    }
+<span class="fc" id="L98">                    serviceOrder.setServiceProviderId(serviceProviderId);</span>
+<span class="fc" id="L99">                    logger.debug(&quot;000status = {}&quot;, serviceOrder.getStatus());</span>
+<span class="fc" id="L100">                    serviceOrder.accept(user);</span>
+<span class="fc" id="L101">                    logger.debug(&quot;111status = {}&quot;, serviceOrder.getStatus());</span>
+<span class="fc" id="L102">                    serviceOrder.setMaintainerMobile(newServiceOrder.getMaintainerMobile());</span>
+<span class="fc" id="L103">                    serviceOrder.setMaintainerName(newServiceOrder.getMaintainerName());</span>
+<span class="fc" id="L104">                    this.serviceOrderDao.save(serviceOrder, user);</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                    if(serviceOrder.getType().equals(ServiceOrder.REPAIR)){</span>
+<span class="nc" id="L106">                        this.freightExpressDao.createFreightExpress(serviceOrder);</span>
+                    }
+<span class="fc" id="L108">                    return;</span>
+                }
+<span class="nc" id="L110">            }</span>
+<span class="nc" id="L111">        }</span>
+<span class="nc" id="L112">        throw new IllegalArgumentException(&quot;serviceOrder can not be accepted.&quot;);</span>
+    }
+
+
+    /**
+     * 服务商取消服务单
+     */
+    public void cancelServiceOrder(Long serviceProviderId, Long id, UserDto user){
+<span class="fc" id="L120">        ServiceOrder serviceOrder = this.serviceOrderDao.findById(id);</span>
+<span class="pc bpc" id="L121" title="2 of 4 branches missed.">        if(serviceOrder.getStatus().equals(ServiceOrder.FINISHED) || serviceOrder.getServiceProviderId() != serviceProviderId){</span>
+<span class="nc" id="L122">            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;服务单&quot;, serviceOrder.getId(), serviceOrder.getStatusName()));</span>
+        }
+<span class="pc bpc" id="L124" title="3 of 4 branches missed.">        if(serviceOrder.getType().equals(ServiceOrder.REPAIR) &amp;&amp; serviceOrder.getStatus().equals(ServiceOrder.RECEIVED)){</span>
+<span class="nc" id="L125">            this.freightExpressDao.createFreightExpress(serviceOrder);</span>
+        }
+<span class="fc" id="L127">        ServiceOrder newServiceOrder = serviceOrder.cancel(serviceOrder,user);</span>
+<span class="fc" id="L128">        this.serviceOrderDao.insert(newServiceOrder, user);</span>
+<span class="fc" id="L129">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

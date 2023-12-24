@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdminAftersaleController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.controller</a> &gt; <span class="el_source">AdminAftersaleController.java</span></div><h1>AdminAftersaleController.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.controller;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.javaee.core.aop.Audit;
+import cn.edu.xmu.javaee.core.validation.NewGroup;
+import cn.edu.xmu.oomall.aftersale.controller.vo.ApproveVo;
+import cn.edu.xmu.oomall.aftersale.dao.bo.Aftersale;
+import cn.edu.xmu.oomall.aftersale.service.AftersaleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import static cn.edu.xmu.javaee.core.model.Constants.PLATFORM;
+@RestController /*Restful的Controller对象*/
+@RequestMapping(value = &quot;/shops/{did}&quot;, produces = &quot;application/json;charset=UTF-8&quot;)
+public class AdminAftersaleController {
+
+<span class="fc" id="L19">    private final Logger logger = LoggerFactory.getLogger(AdminAftersaleController.class);</span>
+    private final AftersaleService aftersaleService;
+
+    @Autowired
+<span class="fc" id="L23">    public AdminAftersaleController(AftersaleService aftersaleService) {</span>
+<span class="fc" id="L24">        this.aftersaleService = aftersaleService;</span>
+<span class="fc" id="L25">    }</span>
+
+//    //管理员根据id查询售后单
+//    @GetMapping(&quot;/aftersales/{id}&quot;)
+////    @Audit(departName = &quot;shops&quot;)
+//    public ReturnObject getAftersaleById(@PathVariable Long did, @PathVariable Long id) {
+//        if (!PLATFORM.equals(did)) { //管理员id
+//            throw new BusinessException(ReturnNo.RESOURCE_ID_OUTSCOPE, String.format(ReturnNo.RESOURCE_ID_OUTSCOPE.getMessage(), &quot;管理员查找&quot;, id, did));
+//        }
+//        Aftersale aftersale=this.aftersaleService.findById(id);
+//
+//        return new ReturnObject(CloneFactory.copy(new AftersaleDto(), aftersale));
+//    }
+//
+//    @PostMapping(&quot;/aftersales/{id}/confirm&quot;)
+////    @Audit(departName = &quot;shops&quot;)
+//    public ReturnObject AdminconfirmAftersale(@PathVariable Long did, @PathVariable Long id, @LoginUser UserDto user,
+//                                         @Validated(NewGroup.class) @RequestBody ApproveVo vo) {
+//        if (!PLATFORM.equals(did)) {
+//            throw new BusinessException(ReturnNo.RESOURCE_ID_OUTSCOPE, String.format(ReturnNo.RESOURCE_ID_OUTSCOPE.getMessage(), &quot;售后管理员&quot;, id, did));
+//        }
+//        if(vo.getresult()) {
+//            Aftersale aftersale=aftersaleService.findById(id);
+//            aftersale.beGoing(user);
+//            aftersale.setConclusion(vo.getcommit());
+//        }
+//        else{
+//            Aftersale aftersale=aftersaleService.findById(id);
+//            aftersale.setConclusion(vo.getcommit());
+//            aftersaleService.updateById(aftersale,user);
+//        }
+//
+//        return new ReturnObject(ReturnNo.OK);
+//    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

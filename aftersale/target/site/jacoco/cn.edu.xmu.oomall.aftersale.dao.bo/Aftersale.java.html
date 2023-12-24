@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Aftersale.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.dao.bo</a> &gt; <span class="el_source">Aftersale.java</span></div><h1>Aftersale.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.dao.bo;
+
+//School of Informatics Xiamen University, GPL-3.0 license
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.bo.OOMallObject;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.oomall.aftersale.controller.dto.ApproveDto;
+import cn.edu.xmu.oomall.aftersale.controller.dto.OrderItemDto;
+import cn.edu.xmu.oomall.aftersale.dao.AftersaleDao;
+import cn.edu.xmu.oomall.aftersale.mapper.po.AftersalePo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import cn.edu.xmu.oomall.aftersale.dao.ArbitrationDao;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+<span class="fc" id="L29">@NoArgsConstructor</span>
+<span class="nc" id="L30">@AllArgsConstructor</span>
+<span class="nc" id="L31">@ToString(callSuper = true, doNotUseGetters = true)</span>
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@CopyFrom({AftersalePo.class, OrderItemDto.class})
+public class Aftersale extends OOMallObject implements Serializable {
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L37">    private final static Logger logger = LoggerFactory.getLogger(Aftersale.class);</span>
+
+    /*特殊的id*/
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L42">    public static final Long TOP_ID = 0L;</span>
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L45">    public static final Long ROOT_PID = -1L;</span>
+
+    /**
+     * 共三种类型：退款、维修、换货
+     */
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L52">    public static final Byte REFUND = 0; //退款</span>
+
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L56">    public static final Byte REPAIR = 1; //维修</span>
+
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L60">    public static final Byte CHANGE = 2; //换货</span>
+
+    /**
+     * 共四种状态：申请中、进行中、仲裁中、已完成
+     */
+    //申请中
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L68">    public static final Byte APPLY = 0;</span>
+    //进行中
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L72">    public static final Byte GOING = 1;</span>
+    //仲裁中
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L76">    public static final Byte ARBITRATION = 2;</span>
+
+    //已完成
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L81">    public static final Byte FINISH = 3;</span>
+
+    @ToString.Exclude
+    @JsonIgnore
+<span class="fc" id="L85">    public static final Map&lt;Byte, String&gt; STATUSNAMES = new HashMap&lt;&gt;() {</span>
+        {
+<span class="fc" id="L87">            put(APPLY, &quot;申请中&quot;);</span>
+<span class="fc" id="L88">            put(GOING, &quot;进行中&quot;);</span>
+<span class="fc" id="L89">            put(ARBITRATION, &quot;仲裁中&quot;);</span>
+<span class="fc" id="L90">            put(FINISH, &quot;已完成&quot;);</span>
+<span class="fc" id="L91">        }</span>
+    };
+
+
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L97">    private static final Map&lt;Byte, Set&lt;Byte&gt;&gt; toStatus = new HashMap&lt;&gt;() {</span>
+        {
+<span class="fc" id="L99">            put(APPLY, new HashSet&lt;&gt;() {</span>
+                {
+<span class="fc" id="L101">                    add(GOING);</span>
+<span class="fc" id="L102">                    add(ARBITRATION);</span>
+<span class="fc" id="L103">                    add(FINISH);</span>
+<span class="fc" id="L104">                }</span>
+            });
+<span class="fc" id="L106">            put(GOING, new HashSet&lt;&gt;() {</span>
+                {
+<span class="fc" id="L108">                    add(ARBITRATION);</span>
+<span class="fc" id="L109">                    add(FINISH);</span>
+<span class="fc" id="L110">                }</span>
+            });
+<span class="fc" id="L112">            put(ARBITRATION, new HashSet&lt;&gt;() {</span>
+                {
+<span class="fc" id="L114">                    add(FINISH);</span>
+<span class="fc" id="L115">                }</span>
+            });
+<span class="fc" id="L117">        }</span>
+    };
+
+    /**
+     * 判断能不能进行状态迁移是否允许状态迁移
+     */
+    public boolean allowStatus(Byte status) {
+<span class="fc" id="L124">        boolean ret = false;</span>
+
+<span class="pc bpc" id="L126" title="2 of 4 branches missed.">        if (null != status &amp;&amp; null != this.status) {</span>
+<span class="fc" id="L127">            Set&lt;Byte&gt; allowStatusSet = toStatus.get(this.status);</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">            if (null != allowStatusSet) {</span>
+<span class="fc" id="L129">                ret = allowStatusSet.contains(status);</span>
+            }
+        }
+<span class="fc" id="L132">        return ret;</span>
+    }
+
+    public Arbitration createArbitrationByAftersale(Arbitration arbitration, UserDto user) {
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">        if (null == this.aftersaleDao){</span>
+<span class="nc" id="L137">            throw new IllegalArgumentException(&quot;Aftersale.createArbitration:aftersaleDao is null&quot;);</span>
+        }
+<span class="pc bpc" id="L139" title="1 of 2 branches missed.">        if (null == this.arbitrationDao){</span>
+<span class="nc" id="L140">            throw new IllegalArgumentException(&quot;Aftersale.createArbitration:arbitrationDao is null&quot;);</span>
+        }
+
+        //如果当前售后单在仲裁中，不能再仲裁;未仲裁才能申请仲裁
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">        if (0 == this.getInArbitrated()) {//0表示未仲裁</span>
+
+<span class="fc" id="L146">            arbitration.setAftersale_id(this.id);</span>
+            //仲裁单状态为已申请
+<span class="fc" id="L148">            arbitration.setStatus(Arbitration.NEW);</span>
+<span class="fc" id="L149">            logger.debug(&quot;createArbitrationByAftersale: arbitration = {}&quot;, arbitration);</span>
+<span class="fc" id="L150">            Arbitration newArbitration= arbitrationDao.insert(arbitration, user);</span>
+<span class="fc" id="L151">            String key=this.aftersaleDao.save(this,user);</span>
+<span class="fc" id="L152">            return newArbitration;</span>
+        }
+        else{
+            //售后已经有仲裁单
+<span class="nc" id="L156">            throw new BusinessException(ReturnNo.AFTERSALE_INARBITRATION, String.format(ReturnNo.AFTERSALE_INARBITRATION.getMessage(), this.id));</span>
+        }
+    }
+
+    /**
+     * 取消仲裁时，修改售后单关于仲裁的信息
+
+     */
+    public String cancelArbitration(UserDto user) {
+<span class="fc" id="L165">        Aftersale newAftersale = new Aftersale();</span>
+<span class="fc" id="L166">        newAftersale.setId(this.id);</span>
+<span class="fc" id="L167">        newAftersale.setInArbitrated(0);</span>
+<span class="fc" id="L168">        String key =  this.aftersaleDao.save(newAftersale, user);</span>
+
+<span class="fc" id="L170">        return key;</span>
+    }
+
+    /**
+     * 获得当前状态名称
+     */
+    @JsonIgnore
+    public String getStatusName() {
+<span class="nc" id="L178">        return STATUSNAMES.get(this.status);</span>
+    }
+
+
+    private Long id;
+    private Long orderItemId;
+    private Long customerId;  //需要从order获取
+    private Long shopId;//需要从order获取
+    private String aftersaleSn;
+    private Byte type; //前端设置，请求服务的原因
+    private String reason;  //前端设置
+    private String conclusion;
+    private Integer quantity; //需要从order获取
+    private Long regionId;   //是否需要前端传入
+    private String address;  //前端设置
+    private String consignee; //需要从order获取
+    private String mobile; //前端设置？还是通过order获取？
+    private Byte status;   //状态，初始时是申请态
+    private Long serviceId; //需要从order获取
+    private String serialNo; //需要从order获取
+    private String name; //需要从order获取
+    private Long creatorId;
+    private String creatorName;
+    private Long modifierId;
+    private String modifierName;
+    private LocalDateTime gmtCreate;
+    private LocalDateTime gmtModified;
+    private Integer inArbitrated;
+
+
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L210">    @Setter</span>
+    private AftersaleDao aftersaleDao;
+
+    @JsonIgnore
+    @ToString.Exclude
+<span class="fc" id="L215">    @Setter</span>
+    private ArbitrationDao arbitrationDao;
+
+    /**
+     * 商家同意售后
+     * @param user 操作者
+     * @return
+     */
+    public Boolean beGoing(UserDto user){
+<span class="nc" id="L224">        return this.changeStatus(Aftersale.GOING, user);</span>
+    }
+
+    /**
+     * 商家不同意
+     * @param user 操作者
+     * @return 删除的redis key
+     */
+    public Boolean beArbitration(UserDto user){
+<span class="nc" id="L233">        return this.changeStatus(Aftersale.ARBITRATION, user);</span>
+    }
+
+    /**
+     * 商家同意售后
+     * @param user 操作者
+     * @return 删除的redis key
+     */
+    public Boolean beFinsh(UserDto user){
+<span class="fc" id="L242">        return this.changeStatus(Aftersale.FINISH, user);</span>
+    }
+    /**
+     *更改状态
+     *
+     * @param status     状态
+     */
+    private boolean changeStatus(Byte status, UserDto user){
+<span class="fc" id="L250">        logger.debug(&quot;changeStatus: id = {}, status = {}&quot;, this.id, status);</span>
+
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">        if (!this.allowStatus(status)) {</span>
+            // 状态不允许变动
+<span class="nc" id="L254">            throw new BusinessException(ReturnNo.STATENOTALLOW, String.format(ReturnNo.STATENOTALLOW.getMessage(), &quot;地区&quot;, this.id, STATUSNAMES.get(this.status)));</span>
+        }
+<span class="fc" id="L256">        Aftersale aftersale = new Aftersale();</span>
+<span class="fc" id="L257">        aftersale.setStatus(status);</span>
+<span class="fc" id="L258">        aftersale.setId(this.id);</span>
+<span class="fc" id="L259">        String key = this.aftersaleDao.save(aftersale, user);</span>
+
+<span class="fc" id="L261">        return true;</span>
+    }
+
+
+    public Aftersale createAftersale(Aftersale bo, UserDto user){
+<span class="fc" id="L266">        bo.setStatus(Aftersale.APPLY);</span>
+<span class="pc bpc" id="L267" title="1 of 2 branches missed.">        if(aftersaleDao==null){</span>
+<span class="nc" id="L268">            throw new RuntimeException();</span>
+        }
+<span class="fc" id="L270">        return aftersaleDao.insert(bo,user);</span>
+    }
+
+    public void refuse(UserDto user){
+<span class="pc bpc" id="L274" title="1 of 2 branches missed.">        if (!this.beFinsh(user)) { //设置为结束</span>
+<span class="nc" id="L275">            throw new BusinessException(ReturnNo.AFTERSALE_APPROVEFALIED, String.format(ReturnNo.AFTERSALE_APPROVEFALIED.getMessage(), &quot;状态不能改变&quot;, id));</span>
+        }
+<span class="fc" id="L277">    }</span>
+    public void accept(UserDto user){
+<span class="nc bnc" id="L279" title="All 2 branches missed.">        if (!this.beGoing(user)) { //通过后，设置为正在进行</span>
+<span class="nc" id="L280">            throw new BusinessException(ReturnNo.AFTERSALE_APPROVEFALIED, String.format(ReturnNo.AFTERSALE_APPROVEFALIED.getMessage(), &quot;状态不能改变&quot;, id));</span>
+        }
+<span class="nc" id="L282">    }</span>
+    public void approve(ApproveDto dto, UserDto user){
+<span class="pc bpc" id="L284" title="1 of 2 branches missed.">        if (dto.getresult()) { //此时是审核通过</span>
+<span class="nc" id="L285">            this.accept(user);</span>
+        } else { //审核不通过
+<span class="fc" id="L287">            this.refuse(user);</span>
+        }
+<span class="fc" id="L289">        this.setConclusion(dto.getcommit()); //设置审核原因</span>
+<span class="fc" id="L290">        aftersaleDao.save(this,user);</span>
+<span class="fc" id="L291">    }</span>
+    public Long getId() {
+<span class="fc" id="L293">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L297">        this.id = id;</span>
+<span class="fc" id="L298">    }</span>
+
+    public Long getOrderItemId() {
+<span class="fc" id="L301">        return orderItemId;</span>
+    }
+
+    public void setOrderItemId(Long orderItemId) {
+<span class="fc" id="L305">        this.orderItemId = orderItemId;</span>
+<span class="fc" id="L306">    }</span>
+
+    public Long getCustomerId() {
+<span class="fc" id="L309">        return customerId;</span>
+    }
+
+    public void setCustomerId(Long customerId) {
+<span class="fc" id="L313">        this.customerId = customerId;</span>
+<span class="fc" id="L314">    }</span>
+
+    public Long getShopId() {
+<span class="fc" id="L317">        return shopId;</span>
+    }
+
+    public void setShopId(Long shopId) {
+<span class="fc" id="L321">        this.shopId = shopId;</span>
+<span class="fc" id="L322">    }</span>
+
+    public String getAftersaleSn() {
+<span class="fc" id="L325">        return aftersaleSn;</span>
+    }
+
+    public void setAftersaleSn(String aftersaleSn) {
+<span class="fc" id="L329">        this.aftersaleSn = aftersaleSn;</span>
+<span class="fc" id="L330">    }</span>
+
+    public Byte getType() {
+<span class="fc" id="L333">        return type;</span>
+    }
+
+    public void setType(Byte type) {
+<span class="fc" id="L337">        this.type = type;</span>
+<span class="fc" id="L338">    }</span>
+
+    public String getReason() {
+<span class="fc" id="L341">        return reason;</span>
+    }
+
+    public void setReason(String reason) {
+<span class="fc" id="L345">        this.reason = reason;</span>
+<span class="fc" id="L346">    }</span>
+
+    public String getConclusion() {
+<span class="fc" id="L349">        return conclusion;</span>
+    }
+
+    public void setConclusion(String conclusion) {
+<span class="fc" id="L353">        this.conclusion = conclusion;</span>
+<span class="fc" id="L354">    }</span>
+
+    public Integer getQuantity() {
+<span class="fc" id="L357">        return quantity;</span>
+    }
+
+    public void setQuantity(Integer quantity) {
+<span class="fc" id="L361">        this.quantity = quantity;</span>
+<span class="fc" id="L362">    }</span>
+
+    public Long getRegionId() {
+<span class="fc" id="L365">        return regionId;</span>
+    }
+
+    public void setRegionId(Long regionId) {
+<span class="fc" id="L369">        this.regionId = regionId;</span>
+<span class="fc" id="L370">    }</span>
+
+    public String getAddress() {
+<span class="fc" id="L373">        return address;</span>
+    }
+
+    public void setAddress(String address) {
+<span class="fc" id="L377">        this.address = address;</span>
+<span class="fc" id="L378">    }</span>
+
+    public String getConsignee() {
+<span class="fc" id="L381">        return consignee;</span>
+    }
+
+    public void setConsignee(String consignee) {
+<span class="fc" id="L385">        this.consignee = consignee;</span>
+<span class="fc" id="L386">    }</span>
+
+    public String getMobile() {
+<span class="fc" id="L389">        return mobile;</span>
+    }
+
+    public void setMobile(String mobile) {
+<span class="fc" id="L393">        this.mobile = mobile;</span>
+<span class="fc" id="L394">    }</span>
+
+    public Byte getStatus() {
+<span class="fc" id="L397">        return status;</span>
+    }
+
+    public void setStatus(Byte status) {
+<span class="fc" id="L401">        this.status = status;</span>
+<span class="fc" id="L402">    }</span>
+
+    public Long getServiceId() {
+<span class="fc" id="L405">        return serviceId;</span>
+    }
+
+    public void setServiceId(Long serviceId) {
+<span class="fc" id="L409">        this.serviceId = serviceId;</span>
+<span class="fc" id="L410">    }</span>
+
+    public String getSerialNo() {
+<span class="fc" id="L413">        return serialNo;</span>
+    }
+
+    public void setSerialNo(String serialNo) {
+<span class="fc" id="L417">        this.serialNo = serialNo;</span>
+<span class="fc" id="L418">    }</span>
+
+    public String getName() {
+<span class="fc" id="L421">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L425">        this.name = name;</span>
+<span class="fc" id="L426">    }</span>
+
+    public Long getCreatorId() {
+<span class="fc" id="L429">        return creatorId;</span>
+    }
+
+    public void setCreatorId(Long creatorId) {
+<span class="fc" id="L433">        this.creatorId = creatorId;</span>
+<span class="fc" id="L434">    }</span>
+
+    public String getCreatorName() {
+<span class="fc" id="L437">        return creatorName;</span>
+    }
+
+    public void setCreatorName(String creatorName) {
+<span class="fc" id="L441">        this.creatorName = creatorName;</span>
+<span class="fc" id="L442">    }</span>
+
+    public Long getModifierId() {
+<span class="fc" id="L445">        return modifierId;</span>
+    }
+
+    public void setModifierId(Long modifierId) {
+<span class="fc" id="L449">        this.modifierId = modifierId;</span>
+<span class="fc" id="L450">    }</span>
+
+    public String getModifierName() {
+<span class="fc" id="L453">        return modifierName;</span>
+    }
+
+    public void setModifierName(String modifierName) {
+<span class="fc" id="L457">        this.modifierName = modifierName;</span>
+<span class="fc" id="L458">    }</span>
+
+    public LocalDateTime getGmtCreate() {
+<span class="fc" id="L461">        return gmtCreate;</span>
+    }
+
+
+    public LocalDateTime getGmtModified() {
+<span class="fc" id="L466">        return gmtModified;</span>
+    }
+
+
+
+    public Integer getInArbitrated() {
+<span class="fc" id="L472">        return inArbitrated;</span>
+    }
+
+    public void setInArbitrated(Integer inArbitrated) {
+<span class="fc" id="L476">        this.inArbitrated = inArbitrated;</span>
+<span class="fc" id="L477">    }</span>
+
+    public AftersaleDao getAftersaleDao() {
+<span class="nc" id="L480">        return aftersaleDao;</span>
+    }
+
+//    public void setAftersaleDao(AftersaleDao aftersaleDao) {
+//        this.aftersaleDao = aftersaleDao;
+//    }
+
+    @Override
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+
+<span class="fc" id="L490">    }</span>
+
+    @Override
+    public void setGmtModified(LocalDateTime gmtModified) {
+
+<span class="fc" id="L495">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

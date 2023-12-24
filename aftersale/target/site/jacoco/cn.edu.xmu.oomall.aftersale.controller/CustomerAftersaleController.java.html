@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomerAftersaleController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.controller</a> &gt; <span class="el_source">CustomerAftersaleController.java</span></div><h1>CustomerAftersaleController.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.controller;
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+
+//import cn.edu.xmu.oomall.
+import cn.edu.xmu.javaee.core.aop.LoginUser;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.ReturnObject;
+import cn.edu.xmu.javaee.core.model.dto.PageDto;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.oomall.aftersale.controller.dto.AftersaleDto;
+import cn.edu.xmu.oomall.aftersale.controller.vo.*;
+import cn.edu.xmu.oomall.aftersale.controller.dto.OrderItemDto;
+import cn.edu.xmu.oomall.aftersale.dao.bo.Aftersale;
+import cn.edu.xmu.oomall.aftersale.service.AftersaleService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController /*Restful的Controller对象*/
+@RequestMapping(produces = &quot;application/json;charset=UTF-8&quot;)
+public class CustomerAftersaleController {
+
+<span class="fc" id="L31">    private final Logger logger = LoggerFactory.getLogger(CustomerAftersaleController.class);</span>
+    private final AftersaleService aftersaleService;
+
+    @Autowired
+<span class="fc" id="L35">    public CustomerAftersaleController(AftersaleService aftersaleService) {</span>
+<span class="fc" id="L36">        this.aftersaleService = aftersaleService;</span>
+<span class="fc" id="L37">    }</span>
+
+    //顾客通过orderId创建售后单：
+    @PostMapping(&quot;/aftersales/createAftersale/{id}&quot;)
+//    @Audit(departName = &quot;customer&quot;),@LoginUser UserDto user
+    public ReturnObject CreateAftersale(@PathVariable Long id,@RequestBody  OrderItemVo vo) {
+
+<span class="fc" id="L44">        UserDto user=new UserDto();</span>
+<span class="fc" id="L45">        OrderItemDto dto=CloneFactory.copy(new OrderItemDto(),vo);</span>
+<span class="fc" id="L46">        dto.setOrderItemId(id);</span>
+<span class="fc" id="L47">        Aftersale aftersale=aftersaleService.createAftersale(dto,user);</span>
+<span class="fc" id="L48">        return new ReturnObject(CloneFactory.copy(new OrderItemDto(),aftersale));</span>
+    }
+
+
+
+//    //顾客查询所有可申请的订单
+//    @GetMapping(&quot;/aftersales/orderitms/{id}&quot;)
+////    @Audit(departName = &quot;orders&quot;)
+//    public void getAllOrder(
+//            @PathVariable(value = &quot;id&quot;,required = true) Long id,
+//            @RequestParam(defaultValue = &quot;0&quot;) Integer page,
+//            @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize
+//    ){
+////        List&lt;Order&gt; orders = this.orderService.findByCustomerId(id, page, pageSize);
+////        List&lt;orderDto&gt; ret = orders.stream().map(obj -&gt; CloneFactory.copy(new orderDto(), obj)).collect(Collectors.toList());
+////        return new ReturnObject(new PageDto&lt;&gt;(ret, page, pageSize));
+//    }
+//
+//    //顾客查询所有可售后
+//    @GetMapping(&quot;/aftersales/SearchAll/{id}&quot;)
+////    @Audit(departName = &quot;orders&quot;)
+//    public ReturnObject getAllAftersale( @PathVariable(value = &quot;id&quot;,required = true) Long id,
+//                @RequestParam(defaultValue = &quot;0&quot;) Integer page,
+//                @RequestParam(defaultValue = &quot;10&quot;) Integer pageSize)
+//    {
+//        List&lt;Aftersale&gt; aftersales = this.aftersaleService.findByCustomerId(id, page, pageSize);
+//        List&lt;AftersaleDto&gt; ret = aftersales.stream().map(obj -&gt; CloneFactory.copy(new AftersaleDto(), obj)).collect(Collectors.toList());
+//        return new ReturnObject(new PageDto&lt;&gt;(ret, page, pageSize));
+//    }
+//
+//    //顾客更新售后单信息
+
+//
+//    //顾客删除售后单
+//    @DeleteMapping(&quot;/aftersales/cancleAftersale/{id}&quot;)
+////    @Audit(departName = &quot;orders&quot;)
+//    public ReturnObject cancleAftersale( @PathVariable(value = &quot;id&quot;,required = true) Long id,
+//                                         @RequestParam CancleVo vo,@LoginUser UserDto user)
+//    {
+//        Aftersale aftersale = aftersaleService.findById(id);
+//        if(!aftersale.beFinsh(user)){
+//        throw new BusinessException(ReturnNo.RESOURCE_ID_OUTSCOPE, String.format(ReturnNo.RESOURCE_ID_OUTSCOPE.getMessage(), &quot;取消售后单&quot;, id));
+//        }
+//        aftersale.setConclusion(vo.getConclusion());
+//        aftersaleService.updateById(aftersale,user);
+//        return new ReturnObject(ReturnNo.OK);
+//    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

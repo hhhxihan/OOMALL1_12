@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductServicePo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.mapper.po</a> &gt; <span class="el_source">ProductServicePo.java</span></div><h1>ProductServicePo.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.mapper.po;
+
+import cn.edu.xmu.javaee.core.aop.CopyFrom;
+import cn.edu.xmu.oomall.service.dao.bo.ProductService;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = &quot;service_product_service&quot;)
+<span class="nc" id="L13">@AllArgsConstructor</span>
+<span class="fc" id="L14">@NoArgsConstructor</span>
+@CopyFrom({ProductService.class})
+public class ProductServicePo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)//为一个实体生成一个唯一标识的主键，主键自增长
+    private Long id;
+
+    /**
+     * 创建者id
+     */
+    private Long creatorId;
+
+    /**
+     * 创建者
+     */
+    private String creatorName;
+
+    /**
+     * 修改者id
+     */
+    private Long modifierId;
+
+    /**
+     * 修改者
+     */
+    private String modifierName;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime gmtCreate;
+
+    /**
+     * 修改时间
+     */
+    private LocalDateTime gmtModified;
+
+    // 服务id
+    private Long serviceId;
+
+    // 商铺id
+    private Long shopId;
+
+    // 商品id
+    private Long productId;
+
+    // 地区id
+    private Long regionId;
+
+    // 状态
+    private Byte status;
+
+<span class="fc" id="L66">    public Long getId() { return id; }</span>
+
+<span class="fc" id="L68">    public void setId(Long id) { this.id = id; }</span>
+
+    public Long getCreatorId() {
+<span class="fc" id="L71">        return creatorId;</span>
+    }
+
+    public void setCreatorId(Long creatorId) {
+<span class="fc" id="L75">        this.creatorId = creatorId;</span>
+<span class="fc" id="L76">    }</span>
+
+    public String getCreatorName() {
+<span class="fc" id="L79">        return creatorName;</span>
+    }
+
+    public void setCreatorName(String creatorName) {
+<span class="fc" id="L83">        this.creatorName = creatorName;</span>
+<span class="fc" id="L84">    }</span>
+
+    public Long getModifierId() {
+<span class="fc" id="L87">        return modifierId;</span>
+    }
+
+    public void setModifierId(Long modifierId) {
+<span class="fc" id="L91">        this.modifierId = modifierId;</span>
+<span class="fc" id="L92">    }</span>
+
+    public String getModifierName() {
+<span class="fc" id="L95">        return modifierName;</span>
+    }
+
+    public void setModifierName(String modifierName) {
+<span class="fc" id="L99">        this.modifierName = modifierName;</span>
+<span class="fc" id="L100">    }</span>
+
+    public LocalDateTime getGmtCreate() {
+<span class="fc" id="L103">        return gmtCreate;</span>
+    }
+
+    public void setGmtCreate(LocalDateTime gmtCreate) {
+<span class="fc" id="L107">        this.gmtCreate = gmtCreate;</span>
+<span class="fc" id="L108">    }</span>
+
+    public LocalDateTime getGmtModified() {
+<span class="fc" id="L111">        return gmtModified;</span>
+    }
+
+    public void setGmtModified(LocalDateTime gmtModified) {
+<span class="fc" id="L115">        this.gmtModified = gmtModified;</span>
+<span class="fc" id="L116">    }</span>
+
+
+<span class="fc" id="L119">    public Long getServiceId() { return serviceId; }</span>
+    public void setServiceId(Long serviceId) {
+<span class="fc" id="L121">        this.serviceId = serviceId;</span>
+<span class="fc" id="L122">    }</span>
+<span class="fc" id="L123">    public Long getProductId() { return productId; }</span>
+    public void setProductId(Long productId) {
+<span class="fc" id="L125">        this.productId = productId;</span>
+<span class="fc" id="L126">    }</span>
+<span class="fc" id="L127">    public Long getShopId() { return shopId; }</span>
+    public void setShopId(Long shopId) {
+<span class="fc" id="L129">        this.shopId = shopId;</span>
+<span class="fc" id="L130">    }</span>
+<span class="fc" id="L131">    public Long getRegionId() { return regionId; }</span>
+    public void setRegionId(Long regionId) {
+<span class="fc" id="L133">        this.regionId = regionId;</span>
+<span class="fc" id="L134">    }</span>
+
+<span class="fc" id="L136">    public Byte getStatus() { return status; }</span>
+
+<span class="fc" id="L138">    public void setStatus(Byte status) { this.status = status; }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

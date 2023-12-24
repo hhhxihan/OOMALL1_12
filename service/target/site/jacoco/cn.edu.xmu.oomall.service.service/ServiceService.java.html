@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">service</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.service.service</a> &gt; <span class="el_source">ServiceService.java</span></div><h1>ServiceService.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.service.service;
+
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.oomall.service.dao.ServiceDao;
+import cn.edu.xmu.oomall.service.dao.ProductServiceDao;
+import cn.edu.xmu.oomall.service.dao.bo.Services;
+import cn.edu.xmu.oomall.service.dao.bo.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Transactional(propagation = Propagation.REQUIRED)
+public class ServiceService {
+<span class="fc" id="L23">    private static final Logger logger = LoggerFactory.getLogger(ServiceService.class);</span>
+
+    private ServiceDao serviceDao;
+    private ProductServiceDao productServiceDao;
+
+    @Autowired
+<span class="fc" id="L29">    public ServiceService(ServiceDao serviceDao, ProductServiceDao productServiceDao) {</span>
+<span class="fc" id="L30">        this.serviceDao = serviceDao;</span>
+<span class="fc" id="L31">        this.productServiceDao = productServiceDao;</span>
+<span class="fc" id="L32">    }</span>
+
+    /**
+     * 商户取消服务商的所有服务
+     */
+    public void cancelAllService(Long shopId, Long serviceProviderId, UserDto user){
+<span class="fc" id="L38">        List&lt;Services&gt; serviceList=this.serviceDao.findByServiceProviderId(serviceProviderId,1, 10);</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        for (Services obj : serviceList){</span>
+<span class="fc" id="L40">            obj.setServiceDao(this.serviceDao);</span>
+<span class="fc" id="L41">            obj.setProductServiceDao(this.productServiceDao);</span>
+<span class="fc" id="L42">            obj.cancelProductServiceByShop(shopId);</span>
+<span class="fc" id="L43">        }</span>
+<span class="fc" id="L44">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

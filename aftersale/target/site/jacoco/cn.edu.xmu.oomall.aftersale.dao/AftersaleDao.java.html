@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AftersaleDao.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">aftersale</a> &gt; <a href="index.source.html" class="el_package">cn.edu.xmu.oomall.aftersale.dao</a> &gt; <span class="el_source">AftersaleDao.java</span></div><h1>AftersaleDao.java</h1><pre class="source lang-java linenums">package cn.edu.xmu.oomall.aftersale.dao;
+
+import cn.edu.xmu.oomall.aftersale.dao.bo.Arbitration;
+import cn.edu.xmu.javaee.core.util.CloneFactory;
+import cn.edu.xmu.javaee.core.exception.BusinessException;
+import cn.edu.xmu.javaee.core.model.ReturnNo;
+import cn.edu.xmu.javaee.core.model.dto.UserDto;
+import cn.edu.xmu.javaee.core.mapper.RedisUtil;
+import cn.edu.xmu.oomall.aftersale.dao.bo.Aftersale;
+import cn.edu.xmu.oomall.aftersale.mapper.AftersalePoMapper;
+import cn.edu.xmu.oomall.aftersale.mapper.po.AftersalePo;
+import jakarta.annotation.Resource;
+import org.hibernate.annotations.Source;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.cloud.autoconfigure.RefreshAutoConfiguration;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.stream.Collectors;
+
+import static cn.edu.xmu.javaee.core.model.Constants.IDNOTEXIST;
+
+@ComponentScan(basePackages = &quot;cn.edu.xmu.oomall.aftersale.mapper&quot;)
+@ImportAutoConfiguration(RefreshAutoConfiguration.class)
+@Repository
+@RefreshScope
+public class AftersaleDao {
+<span class="fc" id="L42">    private final static Logger logger = LoggerFactory.getLogger(AftersaleDao.class);</span>
+    private final static String KEY = &quot;R%d&quot;;
+
+
+
+    @Value(&quot;${oomall.aftersale.timeout}&quot;)
+    private int timeout;
+
+    //    @Autowired
+    private  AftersalePoMapper aftersalePoMapper;
+    //    @Autowired
+    private  RedisUtil redisUtil;
+    @Lazy
+    private ArbitrationDao arbitrationDao;
+    private AftersaleDao aftersaleDao;
+    @Autowired
+    @Lazy
+<span class="fc" id="L59">    public AftersaleDao(AftersaleDao aftersaleDao,AftersalePoMapper aftersalePoMapper, RedisUtil redisUtil,ArbitrationDao arbitrationDao) {</span>
+<span class="fc" id="L60">        this.aftersalePoMapper = aftersalePoMapper;</span>
+<span class="fc" id="L61">        this.arbitrationDao=arbitrationDao;</span>
+<span class="fc" id="L62">        this.aftersaleDao=aftersaleDao;</span>
+<span class="fc" id="L63">        this.redisUtil = redisUtil;</span>
+<span class="fc" id="L64">    }</span>
+
+/*    public void build(Aftersale bo) {
+        bo.setAftersaleDao(AftersaleDao.this);
+    }*/
+
+    public Aftersale build(AftersalePo po, Optional&lt;String&gt; redisKey) {
+<span class="fc" id="L71">        Aftersale bo = cn.edu.xmu.javaee.core.util.CloneFactory.copy(new Aftersale(), po);</span>
+<span class="fc" id="L72">        this.build(bo);</span>
+<span class="fc" id="L73">        redisKey.ifPresent(key -&gt; redisUtil.set(key, bo, timeout));</span>
+<span class="fc" id="L74">        return bo;</span>
+    }
+
+    private  Aftersale build(Aftersale bo){
+<span class="fc" id="L78">        bo.setArbitrationDao(this.arbitrationDao);</span>
+<span class="fc" id="L79">        bo.setAftersaleDao(this);</span>
+<span class="fc" id="L80">        return bo;</span>
+    }
+
+
+
+     public Aftersale findByOrderItemId(Long id){
+<span class="fc" id="L86">        logger.debug(&quot;findByOrderItemId: id = {}&quot;, id);</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if(null == id) {</span>
+<span class="nc" id="L88">            throw new IllegalArgumentException(&quot;id can not be null&quot;);</span>
+        }
+<span class="fc" id="L90">        String key = String.format(KEY, id);</span>
+<span class="fc" id="L91">        Aftersale bo = null;</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (null != bo) {</span>
+<span class="nc" id="L93">            logger.debug(&quot;findByOrderItemId: hit in redis key = {}, region = {}&quot;, key, bo);</span>
+<span class="nc" id="L94">            this.build(bo);</span>
+<span class="nc" id="L95">            return bo;</span>
+        }else {
+<span class="fc" id="L97">            Optional&lt;AftersalePo&gt; ret = aftersalePoMapper.findByOrderItemId(id);</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">            if (ret.isPresent()) {</span>
+<span class="nc" id="L99">                logger.debug(&quot;findByOrderItemId: retrieve from database region = {}&quot;, ret.get());</span>
+<span class="nc" id="L100">                return this.build(ret.get(), Optional.of(key));</span>
+            } else {
+<span class="fc" id="L102">                return null;</span>
+            }
+        }
+    }
+    /**
+     * 通过售后单id查找售后
+     *
+     * @param id
+     * @return Aftersale
+     * @throws RuntimeException
+     */
+    public Aftersale findById(Long id){
+<span class="fc" id="L114">        logger.debug(&quot;findById: id = {}&quot;, id);</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if(null == id) {</span>
+<span class="nc" id="L116">            throw new IllegalArgumentException(&quot;id can not be null&quot;);</span>
+        }
+<span class="fc" id="L118">        String key = String.format(KEY, id);</span>
+<span class="fc" id="L119">        Aftersale bo = (Aftersale) redisUtil.get(key); //从redis缓存中查找舒服，非关系数据库</span>
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">        if (null != bo) {</span>
+<span class="nc" id="L121">            logger.debug(&quot;findById: hit in redis key = {}, region = {}&quot;, key, bo);</span>
+<span class="nc" id="L122">            this.build(bo);</span>
+<span class="nc" id="L123">            return bo;</span>
+        }else {  //如果没有，那么访问数据库
+<span class="fc" id="L125">            Optional&lt;AftersalePo&gt; ret = aftersalePoMapper.findById(id);</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            if (ret.isPresent()) {</span>
+<span class="fc" id="L127">                logger.debug(&quot;findById: retrieve from database region = {}&quot;, ret.get());</span>
+<span class="fc" id="L128">                return this.build(ret.get(), Optional.of(key));</span>
+            } else {
+<span class="fc" id="L130">                throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;售后单&quot;, id));</span>
+            }
+        }
+    }
+
+
+//    public List&lt;Aftersale&gt; findAftersaleByCustomerId(Long customerId, Boolean all, Integer page, Integer pageSize) throws RuntimeException {
+//        logger.debug(&quot;retrieveSubRegionsByPid: customerid = {}&quot;, customerId);
+//        if (null == customerId) {
+//            throw new IllegalArgumentException(&quot;custormerId can not be null.&quot;);
+//        }
+//
+//        Pageable pageable = PageRequest.of(page - 1, pageSize);
+//        List&lt;AftersalePo&gt; poPage;
+//        poPage = this.aftersalePoMapper.findByCustomerId(customerId, pageable);
+//        return poPage.stream()
+//                .map(po -&gt; this.build(po, Optional.ofNullable(null)))
+//                .collect(Collectors.toList());
+//    }
+//
+
+
+//    public List&lt;Aftersale&gt; findAftersaleByShopId(Long shopId, Boolean all, Integer page, Integer pageSize) throws RuntimeException {
+//        logger.debug(&quot;retrieveSubRegionsByPid: shopid = {}&quot;, shopId);
+//        if (null == shopId) {
+//            throw new IllegalArgumentException(&quot;shopId can not be null.&quot;);
+//        }
+//
+//        Pageable pageable = PageRequest.of(page - 1, pageSize);
+//        List&lt;AftersalePo&gt; poPage;
+//        poPage = this.aftersalePoMapper.findByShopId(shopId, pageable);
+//        return poPage.stream()
+//                .map(po -&gt; this.build(po, Optional.ofNullable(null)))
+//                .collect(Collectors.toList());
+//    }
+
+
+//    public List&lt;Aftersale&gt; findAftersaleByServiceId(Long serviceId, Boolean all, Integer page, Integer pageSize) throws RuntimeException {
+//        logger.debug(&quot;retrieveSubRegionsByPid: shopid = {}&quot;, serviceId);
+//        if (null == serviceId) {
+//            throw new IllegalArgumentException(&quot;shopId can not be null.&quot;);
+//        }
+//
+//        Pageable pageable = PageRequest.of(page - 1, pageSize);
+//        List&lt;AftersalePo&gt; poPage;
+//        poPage = this.aftersalePoMapper.findByServiceId(serviceId, pageable);
+//        return poPage.stream()
+//                .map(po -&gt; this.build(po, Optional.ofNullable(null)))
+//                .collect(Collectors.toList());
+//    }
+
+
+    public Aftersale insert(Aftersale bo, UserDto user) throws RuntimeException {
+
+<span class="fc" id="L184">        bo.setCreator(user);</span>
+<span class="fc" id="L185">        bo.setGmtCreate(LocalDateTime.now());</span>
+<span class="fc" id="L186">        Random t=new Random();</span>
+<span class="fc" id="L187">        bo.setId(t.nextLong());</span>
+//        bo.setId(null);
+<span class="fc" id="L189">        AftersalePo po = CloneFactory.copy(new AftersalePo(), bo);</span>
+<span class="fc" id="L190">        logger.debug(&quot;save: po = {}&quot;, po);</span>
+<span class="fc" id="L191">        po = aftersalePoMapper.save(po);</span>
+<span class="fc" id="L192">        bo.setId(po.getId());</span>
+<span class="fc" id="L193">        return bo;</span>
+    }
+
+
+    public String save(Aftersale bo, UserDto user) throws RuntimeException {
+<span class="fc" id="L198">        bo.setModifier(user);</span>
+<span class="fc" id="L199">        bo.setGmtModified(LocalDateTime.now());</span>
+<span class="fc" id="L200">        AftersalePo po = CloneFactory.copy(new AftersalePo(), bo);</span>
+<span class="fc" id="L201">        logger.debug(&quot;save: po = {}&quot;, po);</span>
+<span class="fc" id="L202">        AftersalePo updatePo = aftersalePoMapper.save(po);</span>
+<span class="pc bpc" id="L203" title="1 of 2 branches missed.">        if(IDNOTEXIST.equals(updatePo.getId())) {</span>
+<span class="nc" id="L204">            throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;售后单&quot;, bo.getId()));</span>
+        }
+<span class="fc" id="L206">        return String.format(KEY, bo.getId());</span>
+    }
+
+    /**
+     * 删除售后信息
+     *
+     * @param id 售后单id
+     * @return
+     */
+//    public String deleteById(Long id)throws RuntimeException {
+//
+//        if (!this.aftersalePoMapper.existsById(id))
+//            throw new BusinessException(ReturnNo.RESOURCE_ID_NOTEXIST, String.format(ReturnNo.RESOURCE_ID_NOTEXIST.getMessage(), &quot;售后单&quot;, id));
+//        this.aftersalePoMapper.deleteById(id);
+//        return String.format(KEY, id);
+//    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
